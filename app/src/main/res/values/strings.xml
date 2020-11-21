@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Online Chat</string>
+
+    <string name="add_plus_sign">+</string>
+
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="optional">Optional</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <!-- Welcome screen strings -->
+    <string name="welcome_label">Welcome to OnlineChat</string>
+    <string name="welcome_text_2">To continue using app please</string>
+    <string name="log_in">Log in</string>
+    <string name="register">Register</string>
+    <string name="or">or</string>
+    <string name="continue_online">Continue using app offline</string>
+
+    <!-- Login screen strings -->
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="bottom_label_login">Don’t have an account?\nConsider creating a new one</string>
+    <string name="incorrect_credentials_toast">Invalid login or password!</string>
+
+    <!-- Register screen strings -->
+    <string name="repeat_password">Repeat password</string>
+    <string name="create_account">Create account</string>
+    <string name="bottom_label_register">Already have an account?</string>
+
+    <!-- Group chats screen strings -->
+    <string name="no_messages_yet_label">No messages yet!</string>
+    <string name="send_label">SEND</string>
+</resources>
