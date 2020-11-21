@@ -21,6 +21,7 @@
     <string name="password">Password</string>
     <string name="bottom_label_login">Don’t have an account?\nConsider creating a new one</string>
     <string name="incorrect_credentials_toast">Invalid login or password!</string>
+    <string name="failed_to_connect_toast">Failed to connect to the server. Please, check your internet connection.</string>
 
     <!-- Register screen strings -->
     <string name="repeat_password">Repeat password</string>

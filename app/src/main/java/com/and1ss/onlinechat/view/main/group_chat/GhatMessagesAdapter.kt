@@ -4,11 +4,16 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.amulyakhare.textdrawable.TextDrawable
 import com.and1ss.onlinechat.R
 import com.and1ss.onlinechat.api.dto.GroupMessageRetrievalDTO
 import com.and1ss.onlinechat.api.model.AccountInfo
+import com.and1ss.onlinechat.util.stringToColor
+import java.text.SimpleDateFormat
+
 
 class ChatMessagesAdapter(
     private val list: List<GroupMessageRetrievalDTO>,
@@ -17,10 +22,16 @@ class ChatMessagesAdapter(
 ) :
     RecyclerView.Adapter<ChatMessagesAdapter.MessageViewHolder>() {
 
-    open class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private val dateFormat = SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
+
+    open class MessageViewHolder(itemView: View, val dateFormat: SimpleDateFormat) :
+        RecyclerView.ViewHolder(itemView) {
         open fun bind(message: GroupMessageRetrievalDTO) {}
 
-        class GroupMessageLeftItemHolder(itemView: View) : MessageViewHolder(itemView) {
+        class GroupMessageLeftItemHolder(itemView: View, dateFormat: SimpleDateFormat) :
+            MessageViewHolder(itemView, dateFormat) {
+            private val image: ImageView =
+                itemView.findViewById(R.id.image_message_profile)
             private val authorTextView: TextView =
                 itemView.findViewById(R.id.message_author_label)
             private val contentTextView: TextView =
@@ -29,21 +40,26 @@ class ChatMessagesAdapter(
                 itemView.findViewById(R.id.message_time_label)
 
             override fun bind(message: GroupMessageRetrievalDTO) {
-                authorTextView.text =
-                    message.author?.name ?: "" + " " + message.author?.surname ?: ""
+                val initials = message.author?.getInitials() ?: ""
+                val nameSurname = message.author?.name ?: "" + " " + message.author?.surname
 
+                image.setImageDrawable(
+                    TextDrawable.builder()
+                        .buildRound(initials, stringToColor(nameSurname))
+                )
+                authorTextView.text = nameSurname
+                contentTextView.text = message.contents
                 messageTimeTextView.text =
                     if (message.createdAt != null) {
-                        message.createdAt.toString()
+                        dateFormat.format(message.createdAt).toString()
                     } else {
                         ""
                     }
-
-                contentTextView.text = message.contents
             }
         }
 
-        class GroupMessageRightItemHolder(itemView: View) : MessageViewHolder(itemView) {
+        class GroupMessageRightItemHolder(itemView: View, dateFormat: SimpleDateFormat) :
+            MessageViewHolder(itemView, dateFormat) {
             private val contentTextView: TextView =
                 itemView.findViewById(R.id.message_body_label)
             private val messageTimeTextView: TextView =
@@ -52,7 +68,7 @@ class ChatMessagesAdapter(
             override fun bind(message: GroupMessageRetrievalDTO) {
                 messageTimeTextView.text =
                     if (message.createdAt != null) {
-                        message.createdAt.toString()
+                        dateFormat.format(message.createdAt).toString() + " "
                     } else {
                         ""
                     }
@@ -68,13 +84,13 @@ class ChatMessagesAdapter(
             VIEW_TYPE_LEFT -> MessageViewHolder.GroupMessageLeftItemHolder(
                 layoutInflater.inflate(
                     R.layout.group_chat_message_left, parent, false
-                )
+                ), dateFormat
             )
 
             VIEW_TYPE_RIGHT -> MessageViewHolder.GroupMessageRightItemHolder(
                 layoutInflater.inflate(
                     R.layout.group_chat_message_right, parent, false
-                )
+                ), dateFormat
             )
 
             else -> throw IllegalStateException("Incorrect view type: $viewType")

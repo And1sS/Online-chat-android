@@ -20,7 +20,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.Exception
+import java.net.ConnectException
+
+private const val TAG = "LoginFragment"
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -71,6 +73,8 @@ class LoginFragment : Fragment() {
                     withContext(Dispatchers.Main) {
                         transitToMainActivity()
                     }
+                } catch (e: ConnectException) {
+                    showConnectionFailedToast()
                 } catch (e: Exception) {
                     showInvalidCredentialsToast()
                 }
@@ -86,6 +90,14 @@ class LoginFragment : Fragment() {
         Toast.makeText(
             requireContext(),
             R.string.incorrect_credentials_toast,
+            Toast.LENGTH_LONG
+        ).show()
+    }
+
+    private inline fun showConnectionFailedToast() {
+        Toast.makeText(
+            requireContext(),
+            R.string.failed_to_connect_toast,
             Toast.LENGTH_LONG
         ).show()
     }

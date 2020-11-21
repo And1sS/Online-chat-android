@@ -3,6 +3,7 @@ package com.and1ss.onlinechat.view.main.group_chat
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,11 +12,13 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.and1ss.onlinechat.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+
+private const val TAG = "GroupChatFragment"
 
 @AndroidEntryPoint
 class GroupChatFragment : Fragment() {
@@ -70,17 +73,32 @@ class GroupChatFragment : Fragment() {
         }
 
         recyclerView.apply {
-            layoutManager = LinearLayoutManager(context).apply {
+            layoutManager = StaggeredGridLayoutManager(
+                1, StaggeredGridLayoutManager.VERTICAL
+            ).apply {
                 reverseLayout = true
             }
-        }
-
-        viewModel.reversedChatMessages.observe(viewLifecycleOwner) { messages ->
-            recyclerView.adapter = ChatMessagesAdapter(
-                list = messages,
+            overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+            adapter = ChatMessagesAdapter(
+                list = viewModel.chatMessages,
                 context = requireContext(),
                 me = viewModel.myAccount
             )
+        }
+
+        viewModel.notifier.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                is Event.LoadedInitial -> {
+                    recyclerView.adapter?.notifyDataSetChanged()
+                    recyclerView.layoutManager?.scrollToPosition(0)
+                }
+
+                is Event.MessageAdd -> {
+                    recyclerView.adapter?.notifyDataSetChanged()
+                    recyclerView.layoutManager?.scrollToPosition(0)
+                }
+                else -> Log.d(TAG, "onEvent: $event")
+            }
         }
 
         lifecycle.coroutineScope.launch {

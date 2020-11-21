@@ -1,18 +1,17 @@
 package com.and1ss.onlinechat.view.launcher
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.coroutineScope
 import com.and1ss.onlinechat.api.model.AccountInfo
 import com.and1ss.onlinechat.api.rest.rest_wrapper.RestWrapper
 import com.and1ss.onlinechat.util.shared_preferences.SharedPreferencesWrapper
-import com.and1ss.onlinechat.view.main.MainActivity
 import com.and1ss.onlinechat.view.auth.AuthenticationActivity
+import com.and1ss.onlinechat.view.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 import javax.inject.Inject
 
 private const val TAG = "MainActivity"
@@ -33,7 +32,7 @@ class LauncherActivity : AppCompatActivity() {
             withContext(Dispatchers.IO) {
                 try {
                     val token = sharedPreferencesWrapper.getAccessToken()
-                    restWrapper.saveAccessToken(token!!)
+                    restWrapper.saveAccessToken(token)
 
 
                     val myAccount = restWrapper.getApi().getMyAccount()

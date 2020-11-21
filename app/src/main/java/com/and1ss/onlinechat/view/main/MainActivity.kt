@@ -6,19 +6,25 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.and1ss.onlinechat.R
+import com.and1ss.onlinechat.api.ws.WebSocketWrapper
 import com.and1ss.onlinechat.view.auth.ActivityChanger
 import com.and1ss.onlinechat.view.auth.FragmentChanger
 import com.and1ss.onlinechat.view.main.group_chat_list.GroupChatsFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), FragmentChanger, ActivityChanger {
+    @Inject
+    lateinit var webSocketWrapper: WebSocketWrapper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        webSocketWrapper.connect()
         if (supportFragmentManager.findFragmentById(R.id.fragment_container) == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, GroupChatsFragment.newInstance())

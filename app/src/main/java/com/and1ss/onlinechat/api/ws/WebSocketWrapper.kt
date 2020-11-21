@@ -16,32 +16,23 @@ import javax.inject.Inject
 private const val TAG = "WebSocketWrapper"
 
 private const val NUM_OF_THREADS = 1
-private const val REMOTE_HOST_URL = "ws://10.0.2.2:8080/api/ws"
+private const val REMOTE_HOST_URL = "ws://176.36.243.160:8080/api/ws"
 private const val AUTHORIZATION_HEADER = "Authorization"
 private const val BEARER_PREFIX = "Bearer "
 
 class WebSocketWrapper @Inject constructor(
-    restWrapper: RestWrapper,
+    private val restWrapper: RestWrapper,
     private val client: OkHttpClient
 ) {
     private lateinit var webSocket: WebSocket
 
     private val webSocketListener: WebSocketListener = ChatWebSocketListener()
 
-    private val requestBuilder: Request.Builder = Request
-        .Builder()
-        .url(REMOTE_HOST_URL)
-        .addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + restWrapper.getAccessToken())
-
     private val dispatcher = Executors.newFixedThreadPool(NUM_OF_THREADS).asCoroutineDispatcher()
 
     private val _eventBus: MutableLiveData<WebSocketEvent> = MutableLiveData()
     val eventBus: LiveData<WebSocketEvent>
         get() = _eventBus
-
-    init {
-        connect()
-    }
 
     fun send(message: String) {
         Log.d(TAG, "WebSocketWrapper: sending $message")
@@ -52,6 +43,15 @@ class WebSocketWrapper @Inject constructor(
         if (this::webSocket.isInitialized) {
             webSocket.cancel()
         }
+
+        val requestBuilder: Request.Builder = Request
+            .Builder()
+            .url(REMOTE_HOST_URL)
+            .addHeader(
+                AUTHORIZATION_HEADER,
+                BEARER_PREFIX + restWrapper.getAccessToken()
+            )
+
         webSocket = client.newWebSocket(requestBuilder.build(), webSocketListener)
     }
 

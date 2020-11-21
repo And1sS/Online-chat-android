@@ -1,18 +1,20 @@
 package com.and1ss.onlinechat.api.rest.rest_wrapper
 
+import com.and1ss.onlinechat.api.dto.LoginInfoDTO
 import com.and1ss.onlinechat.api.model.AccountInfo
 import com.and1ss.onlinechat.api.rest.ApiEndpoints
-import com.google.gson.GsonBuilder
 import com.and1ss.onlinechat.util.shared_preferences.SharedPreferencesWrapper
+import com.google.gson.GsonBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 
 
-private const val BASE_URL = "http://10.0.2.2:8080/api/"
+private const val BASE_URL = "http://176.36.243.160:8080/api/"
 private const val TAG = "Repository"
 
 
@@ -23,7 +25,7 @@ class RestWrapperImpl
     private val retrofit: Retrofit
     private val api: ApiEndpoints
 
-    private lateinit var accessToken: String
+    private var accessToken: String = ""
     private lateinit var myAccount: AccountInfo
 
     init {
@@ -44,11 +46,22 @@ class RestWrapperImpl
         api = retrofit.create(ApiEndpoints::class.java)
     }
 
-    override fun getApi(): ApiEndpoints = api
+    override fun getApi(): ApiEndpoints {
+        if (accessToken.isEmpty()) {
+            throw IllegalStateException("Api consuming without logging")
+        }
+        return api
+    }
+
+    override suspend fun login(loginCredentials: LoginInfoDTO) =
+        withContext(Dispatchers.IO) {
+            saveAccessToken(api.login(loginCredentials).mapToAccessToken())
+            saveMyAccount(api.getMyAccount().mapToAccountInfo())
+        }
 
     override fun getAccessToken(): String = accessToken
 
-    override fun saveAccessToken(accessToken: String) {
+    override suspend fun saveAccessToken(accessToken: String) {
         this.accessToken = accessToken
         sharedPreferencesWrapper.saveAccessToken(accessToken)
     }
@@ -63,8 +76,8 @@ class RestWrapperImpl
         override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
             val newRequestBuilder = chain.request().newBuilder()
 
-            accessToken?.let {
-                newRequestBuilder.addHeader("Authorization", "Bearer $it")
+            if (accessToken.isNotEmpty()) {
+                newRequestBuilder.addHeader("Authorization", "Bearer $accessToken")
             }
 
             val newRequest = newRequestBuilder.build()

@@ -3,7 +3,6 @@ package com.and1ss.onlinechat.view.main.group_chat
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.and1ss.onlinechat.api.dto.AccountInfoRetrievalDTO
 import com.and1ss.onlinechat.api.dto.GroupMessageCreationDTO
 import com.and1ss.onlinechat.api.dto.GroupMessageRetrievalDTO
 import com.and1ss.onlinechat.api.model.AccountInfo
@@ -15,28 +14,27 @@ import com.and1ss.onlinechat.api.ws.webSocketMessageToJson
 import com.and1ss.onlinechat.util.fromJson
 import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.Exception
+import java.util.Collections.synchronizedList
 
 private const val TAG = "GroupChatViewModel"
 
 class GroupChatViewModel
 @ViewModelInject constructor(
-    private val restWrapper: RestWrapper,
-    private val webSocketWrapper: WebSocketWrapper
+    val restWrapper: RestWrapper,
+    val webSocketWrapper: WebSocketWrapper
 ) : ViewModel() {
     var chatId: String = ""
     var myAccount: AccountInfo = restWrapper.getMyAccount()
 
     var messageString = ""
 
-    private val _chatMessages: MutableLiveData<List<GroupMessageRetrievalDTO>> =
-        MutableLiveData(listOf())
-    val reversedChatMessages: LiveData<List<GroupMessageRetrievalDTO>>
-        get() = _chatMessages
+    val chatMessages: MutableList<GroupMessageRetrievalDTO> = synchronizedList(mutableListOf())
+    private val _notifier: MutableLiveData<Event> = MutableLiveData()
+    val notifier: LiveData<Event>
+        get() = _notifier
 
     private val observer = Observer<WebSocketEvent> { onNewWebSocketEvent(it) }
 
@@ -63,11 +61,16 @@ class GroupChatViewModel
 
         messages?.let {
             withContext(Dispatchers.Default) {
-                _chatMessages.postValue(
-                    messages.sortedByDescending {
-                        it.createdAt?.time ?: 0
-                    }
+                chatMessages.clear()
+                chatMessages.addAll(
+                    messages
+                        .filter { it.createdAt?.time != null }
+                        .sortedByDescending {
+                            it.createdAt?.time ?: 0
+                        }
                 )
+
+                _notifier.postValue(Event.LoadedInitial)
             }
         }
     }
@@ -98,19 +101,29 @@ class GroupChatViewModel
             Gson().toJson(message.payload as LinkedTreeMap<*, *>)
         )
 
-        val list = _chatMessages.value
-
-        if (list != null) {
-            val mutableList = list.toMutableList()
-            mutableList.add(msg)
-
-            viewModelScope.launch(Dispatchers.Default) {
-                _chatMessages.postValue(
-                    mutableList.sortedByDescending {
-                        it.createdAt?.time ?: 0
-                    }
-                )
+        viewModelScope.launch(Dispatchers.Default) {
+            if (!msg.chatId?.toString().equals(chatId)) {
+                // TODO: make notifications? or smth
+                return@launch
             }
+
+            for (i in 0 until chatMessages.size) {
+                if (chatMessages[i].createdAt?.time ?: 0 > msg.createdAt?.time ?: 0) {
+                    chatMessages.add(i + 1, msg)
+
+                    _notifier.postValue(Event.MessageAdd(msg, i))
+                    return@launch
+                }
+            }
+
+            chatMessages.add(0, msg)
+            _notifier.postValue(Event.MessageAdd(msg, 0))
         }
     }
+}
+
+sealed class Event {
+    class MessageAdd(val message: GroupMessageRetrievalDTO, val index: Int) : Event()
+    class MessagePatch(val message: GroupMessageRetrievalDTO, val index: Int) : Event()
+    object LoadedInitial : Event()
 }
