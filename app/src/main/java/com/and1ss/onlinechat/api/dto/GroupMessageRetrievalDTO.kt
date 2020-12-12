@@ -2,7 +2,6 @@ package com.and1ss.onlinechat.api.dto
 
 import com.google.gson.annotations.SerializedName
 import java.sql.Timestamp
-import java.util.*
 
 
 data class GroupMessageRetrievalDTO(
@@ -10,7 +9,7 @@ data class GroupMessageRetrievalDTO(
     var author: AccountInfoRetrievalDTO? = null,
 
     @SerializedName("chat_id")
-    var chatId: UUID? = null,
+    var chatId: String? = null,
     var contents: String? = null,
 
     @SerializedName("created_at") val createdAt: Timestamp? = null

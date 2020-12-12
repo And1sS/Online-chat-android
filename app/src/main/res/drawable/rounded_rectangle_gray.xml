@@ -3,9 +3,7 @@
     android:shape="rectangle" >
 
     <!-- View background color -->
-    <solid
-        android:color="@color/colorOrange" >
-    </solid>
+    <solid android:color="@color/colorTextLight"></solid>
 
     <!-- The radius makes the corners rounded -->
     <corners

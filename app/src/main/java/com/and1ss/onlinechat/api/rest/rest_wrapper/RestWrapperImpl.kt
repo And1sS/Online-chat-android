@@ -56,7 +56,7 @@ class RestWrapperImpl
     override suspend fun login(loginCredentials: LoginInfoDTO) =
         withContext(Dispatchers.IO) {
             saveAccessToken(api.login(loginCredentials).mapToAccessToken())
-            saveMyAccount(api.getMyAccount().mapToAccountInfo())
+            saveMyAccount(api.getMyAccount().mapToAccountInfoOrThrow())
         }
 
     override fun getAccessToken(): String = accessToken

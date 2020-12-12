@@ -6,6 +6,7 @@ import androidx.lifecycle.*
 import com.and1ss.onlinechat.api.dto.GroupMessageCreationDTO
 import com.and1ss.onlinechat.api.dto.GroupMessageRetrievalDTO
 import com.and1ss.onlinechat.api.model.AccountInfo
+import com.and1ss.onlinechat.api.model.GroupChat
 import com.and1ss.onlinechat.api.rest.rest_wrapper.RestWrapper
 import com.and1ss.onlinechat.api.ws.WebSocketEvent
 import com.and1ss.onlinechat.api.ws.WebSocketMessageType
@@ -24,9 +25,9 @@ private const val TAG = "GroupChatViewModel"
 class GroupChatViewModel
 @ViewModelInject constructor(
     val restWrapper: RestWrapper,
-    val webSocketWrapper: WebSocketWrapper
+    private val webSocketWrapper: WebSocketWrapper
 ) : ViewModel() {
-    var chatId: String = ""
+    lateinit var chat: GroupChat
     var myAccount: AccountInfo = restWrapper.getMyAccount()
 
     var messageString = ""
@@ -38,38 +39,37 @@ class GroupChatViewModel
 
     private val observer = Observer<WebSocketEvent> { onNewWebSocketEvent(it) }
 
-    init {
-        webSocketWrapper.eventBus.observeForever(observer)
+    fun connect() {
+        webSocketWrapper.getEventBus().observeForever(observer)
     }
 
     fun send(message: String) {
         val webSocketMessage = WebSocketEvent.WebSocketMessage(
             messageType = WebSocketMessageType.GROUP_MESSAGE_CREATE,
-            payload = GroupMessageCreationDTO(message, chatId)
+            payload = GroupMessageCreationDTO(message, chat.id)
         )
-        webSocketWrapper.send(
-            webSocketMessageToJson(webSocketMessage)
-        )
+        webSocketWrapper.send(webSocketMessageToJson(webSocketMessage))
     }
 
     suspend fun getAllMessages() = withContext(Dispatchers.IO) {
         val messages = try {
-            restWrapper.getApi().getAllMessagesForGroupChat(chatId)
+            restWrapper.getApi().getAllMessagesForGroupChat(chat.id)
         } catch (e: Exception) {
             null
         }
 
         messages?.let {
             withContext(Dispatchers.Default) {
-                chatMessages.clear()
-                chatMessages.addAll(
-                    messages
-                        .filter { it.createdAt?.time != null }
-                        .sortedByDescending {
-                            it.createdAt?.time ?: 0
-                        }
-                )
-
+                synchronized(chatMessages) {
+                    chatMessages.clear()
+                    chatMessages.addAll(
+                        messages
+                            .filter { it.createdAt?.time != null }
+                            .sortedByDescending {
+                                it.createdAt?.time ?: 0
+                            }
+                    )
+                }
                 _notifier.postValue(Event.LoadedInitial)
             }
         }
@@ -102,21 +102,23 @@ class GroupChatViewModel
         )
 
         viewModelScope.launch(Dispatchers.Default) {
-            if (!msg.chatId?.toString().equals(chatId)) {
+            if (!msg.chatId.equals(chat.id)) {
                 // TODO: make notifications? or smth
                 return@launch
             }
 
-            for (i in 0 until chatMessages.size) {
-                if (chatMessages[i].createdAt?.time ?: 0 > msg.createdAt?.time ?: 0) {
-                    chatMessages.add(i + 1, msg)
+            synchronized(chatMessages) {
+                for (i in 0 until chatMessages.size) {
+                    if (chatMessages[i].createdAt?.time ?: 0 > msg.createdAt?.time ?: 0) {
+                        chatMessages.add(i + 1, msg)
 
-                    _notifier.postValue(Event.MessageAdd(msg, i))
-                    return@launch
+                        _notifier.postValue(Event.MessageAdd(msg, i))
+                        return@launch
+                    }
                 }
-            }
 
-            chatMessages.add(0, msg)
+                chatMessages.add(0, msg)
+            }
             _notifier.postValue(Event.MessageAdd(msg, 0))
         }
     }

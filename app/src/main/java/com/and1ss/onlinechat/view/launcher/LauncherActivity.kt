@@ -12,6 +12,7 @@ import com.and1ss.onlinechat.view.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.net.ConnectException
 import javax.inject.Inject
 
 private const val TAG = "MainActivity"
@@ -45,6 +46,8 @@ class LauncherActivity : AppCompatActivity() {
                     )
 
                     startActivity(MainActivity::class.java)
+                } catch (e: ConnectException) {
+                    startActivity(AuthenticationActivity::class.java)
                 } catch (e: Exception) {
                     startActivity(AuthenticationActivity::class.java)
                 }

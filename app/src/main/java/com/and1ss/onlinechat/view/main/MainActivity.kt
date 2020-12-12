@@ -24,7 +24,10 @@ class MainActivity : AppCompatActivity(), FragmentChanger, ActivityChanger {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        webSocketWrapper.connect()
+        if (!webSocketWrapper.isConnected()) {
+            webSocketWrapper.connect()
+        }
+
         if (supportFragmentManager.findFragmentById(R.id.fragment_container) == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, GroupChatsFragment.newInstance())

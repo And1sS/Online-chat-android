@@ -7,7 +7,8 @@ data class AccountInfoRetrievalDTO(
     var name: String? = null,
     var surname: String? = null
 ) {
-    fun mapToAccountInfo() =
+    @Throws(NullPointerException::class)
+    fun mapToAccountInfoOrThrow() =
         AccountInfo(id!!, name!!, surname!!)
 
     fun getInitials(): String {

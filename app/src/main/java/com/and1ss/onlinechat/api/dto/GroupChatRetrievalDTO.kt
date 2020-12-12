@@ -1,18 +1,26 @@
 package com.and1ss.onlinechat.api.dto
 
 
+import com.and1ss.onlinechat.api.model.GroupChat
 import com.google.gson.annotations.SerializedName
-import java.util.*
 
 
 data class GroupChatRetrievalDTO(
-    var id: UUID? = null,
+    var id: String? = null,
     var title: String? = null,
     var about: String? = null,
     var creator: AccountInfoRetrievalDTO? = null,
-    var participants: List<AccountInfoRetrievalDTO>? = null,
     @SerializedName("last_message")
     var lastMessage: GroupMessageRetrievalDTO? = null
-)
+) {
+    @Throws(NullPointerException::class)
+    fun mapToGroupChatOrThrow() =
+        GroupChat(
+            id = id!!,
+            title = title!!,
+            about = about,
+            creator = creator?.mapToAccountInfoOrThrow()
+        )
+}
 
 

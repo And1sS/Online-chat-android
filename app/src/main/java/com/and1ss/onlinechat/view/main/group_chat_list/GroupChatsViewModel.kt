@@ -3,16 +3,19 @@ package com.and1ss.onlinechat.view.main.group_chat_list
 import android.app.Application
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.and1ss.onlinechat.api.dto.GroupChatRetrievalDTO
+import com.and1ss.onlinechat.api.dto.GroupMessageRetrievalDTO
 import com.and1ss.onlinechat.api.rest.rest_wrapper.RestWrapper
 import com.and1ss.onlinechat.api.ws.WebSocketEvent
 import com.and1ss.onlinechat.api.ws.WebSocketMessageType
 import com.and1ss.onlinechat.api.ws.WebSocketWrapper
-import com.and1ss.onlinechat.api.dto.GroupMessageRetrievalDTO
+import com.and1ss.onlinechat.util.fromJson
 import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
-import com.and1ss.onlinechat.util.fromJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -30,18 +33,29 @@ class GroupChatsViewModel @ViewModelInject constructor(
     private val observer = Observer<WebSocketEvent> { onNewWebSocketEvent(it) }
 
     init {
-        webSocketWrapper.eventBus.observeForever(observer)
+        webSocketWrapper.getEventBus().observeForever(observer)
     }
 
     override fun onCleared() {
         super.onCleared()
-        webSocketWrapper.eventBus.removeObserver(observer)
+        webSocketWrapper.getEventBus().removeObserver(observer)
     }
 
     suspend fun getChats() = withContext(Dispatchers.IO) {
-        val chats = restWrapper.getApi().getAllGroupChats().sortedByDescending {
-            it.lastMessage?.createdAt?.time ?: 0
-        }
+        val chats = restWrapper
+            .getApi()
+            .getAllGroupChats()
+            .mapNotNull {
+                try {
+                    it.mapToGroupChatOrThrow()
+                    it
+                } catch (e: Exception) {
+                    null
+                }
+            }.sortedByDescending {
+                it.lastMessage?.createdAt?.time ?: 0
+            }
+
         _chats.postValue(chats)
     }
 
@@ -71,23 +85,31 @@ class GroupChatsViewModel @ViewModelInject constructor(
             Gson().toJson(message.payload as LinkedTreeMap<*, *>)
         )
 
-        val list = _chats.value
+        val chats = _chats.value
 
-        if (list != null) {
-            list.forEach { groupChat ->
-                if (groupChat.id != null
-                    && msg.chatId != null
-                    && groupChat.id == msg.chatId
-                ) {
-                    groupChat.lastMessage = msg
-                }
-            }
+        if (chats != null) {
+            updateChatsWithNewMessage(chats, msg)
 
             _chats.postValue(
-                list.sortedByDescending {
+                chats.sortedByDescending {
                     it.lastMessage?.createdAt?.time ?: 0
                 }
             )
+        }
+    }
+
+    private fun updateChatsWithNewMessage(
+        chats: List<GroupChatRetrievalDTO>,
+        message: GroupMessageRetrievalDTO
+    ) {
+        fun messageMatchesChat(chat: GroupChatRetrievalDTO, message: GroupMessageRetrievalDTO) =
+            chat.id != null && message.chatId != null && chat.id == message.chatId
+
+        for (chat in chats) {
+            if (messageMatchesChat(chat, message)) {
+                chat.lastMessage = message
+                break
+            }
         }
     }
 }

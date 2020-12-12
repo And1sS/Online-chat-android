@@ -61,7 +61,7 @@ class GroupChatsFragment : Fragment() {
     inner class ChatsAdapter(private val list: List<GroupChatRetrievalDTO>) :
         RecyclerView.Adapter<ChatsAdapter.GroupChatItemHolder>() {
         inner class GroupChatItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            private var chatId: String? = null
+            private lateinit var chat: GroupChatRetrievalDTO
             private val chatTitleTextView: TextView =
                 itemView.findViewById(R.id.chat_title_label)
             private val chatLastMessageTextView: TextView =
@@ -71,7 +71,9 @@ class GroupChatsFragment : Fragment() {
 
             init {
                 itemView.setOnClickListener {
-                    (activity as? FragmentChanger)?.transitToFragment(GroupChatFragment.newInstance(chatId!!))
+                    (activity as? FragmentChanger)?.transitToFragment(
+                        GroupChatFragment.newInstance(chat.mapToGroupChatOrThrow())
+                    )
                 }
             }
 
@@ -92,7 +94,7 @@ class GroupChatsFragment : Fragment() {
                         resources.getString(R.string.no_messages_yet_label)
                     }
 
-                chatId = chat.id.toString()
+                this.chat = chat
             }
         }
 

@@ -14,7 +14,6 @@ import com.and1ss.onlinechat.api.model.AccountInfo
 import com.and1ss.onlinechat.util.stringToColor
 import java.text.SimpleDateFormat
 
-
 class ChatMessagesAdapter(
     private val list: List<GroupMessageRetrievalDTO>,
     private val context: Context,
@@ -22,7 +21,7 @@ class ChatMessagesAdapter(
 ) :
     RecyclerView.Adapter<ChatMessagesAdapter.MessageViewHolder>() {
 
-    private val dateFormat = SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
+    private val dateFormat = SimpleDateFormat("yyyy.MM.dd HH:mm")
 
     open class MessageViewHolder(itemView: View, val dateFormat: SimpleDateFormat) :
         RecyclerView.ViewHolder(itemView) {
@@ -104,10 +103,16 @@ class ChatMessagesAdapter(
             VIEW_TYPE_LEFT
         }
 
+
     override fun getItemCount(): Int = list.size
 
-    override fun onBindViewHolder(holder: MessageViewHolder, position: Int) =
-        holder.bind(list[position])
+    override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
+        synchronized(list) {
+            if (position in list.indices) {
+                holder.bind(list[position])
+            }
+        }
+    }
 
     companion object {
         private const val VIEW_TYPE_LEFT = 0
