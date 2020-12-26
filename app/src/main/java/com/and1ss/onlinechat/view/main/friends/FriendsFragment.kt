@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +15,7 @@ import com.and1ss.onlinechat.api.dto.FriendRetrievalDTO
 import com.and1ss.onlinechat.api.model.AccountInfo
 import com.and1ss.onlinechat.api.rest.RestWrapper
 import com.and1ss.onlinechat.view.auth.FragmentChanger
+import com.and1ss.onlinechat.view.main.HideShowIconInterface
 import com.and1ss.onlinechat.view.main.add_friends.AddNewFriendsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,17 +48,15 @@ class FriendsFragment : Fragment(), FriendsAdapter.FriendsCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView.adapter = FriendsAdapter(mutableList, this)
-        recyclerView.layoutManager = LinearLayoutManager(context)
 
-        viewModel.friends.observe(viewLifecycleOwner) {
-            mutableList.clear()
-            mutableList.addAll(it)
-
-            recyclerView.adapter!!.notifyDataSetChanged()
-        }
+        setUpAddButton()
+        setUpToolbar()
+        setUpRecyclerView()
+        setUpObservers()
         viewModel.getFriends()
+    }
 
+    private fun setUpAddButton() {
         addButton.setOnClickListener {
             (activity as? FragmentChanger)?.transitToFragment(
                 AddNewFriendsFragment.newInstance()
@@ -64,8 +64,24 @@ class FriendsFragment : Fragment(), FriendsAdapter.FriendsCallback {
         }
     }
 
-    companion object {
-        fun newInstance(): Fragment = FriendsFragment()
+    private fun setUpRecyclerView() {
+        recyclerView.adapter = FriendsAdapter(mutableList, this)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+
+    }
+
+    private fun setUpToolbar() {
+        (requireActivity() as HideShowIconInterface).showHamburgerIcon()
+        (requireActivity() as AppCompatActivity).supportActionBar?.setTitle(R.string.friends_label)
+    }
+
+    private fun setUpObservers() {
+        viewModel.friends.observe(viewLifecycleOwner) {
+            mutableList.clear()
+            mutableList.addAll(it)
+
+            recyclerView.adapter!!.notifyDataSetChanged()
+        }
     }
 
     override fun acceptFriendRequest(userId: String) {
@@ -78,6 +94,9 @@ class FriendsFragment : Fragment(), FriendsAdapter.FriendsCallback {
 
     override fun getCurrentContext(): Context = requireContext()
 
-    override fun getCurrentUserAccount(): AccountInfo =
-        restWrapper.getMyAccount()
+    override fun getCurrentUserAccount(): AccountInfo = restWrapper.getMyAccount()
+
+    companion object {
+        fun newInstance(): Fragment = FriendsFragment()
+    }
 }

@@ -8,6 +8,10 @@
     <string name="optional">Optional</string>
     <string name="title_activity_main">MainActivity</string>
 
+    <!-- Navigation drawer strings -->
+    <string name="nav_drawer_open">Navigation drawer open</string>
+    <string name="nav_drawer_close">Navigation drawer close</string>
+
     <!-- Welcome screen strings -->
     <string name="welcome_label">Welcome to OnlineChat</string>
     <string name="welcome_text_2">To continue using app please</string>
@@ -29,6 +33,9 @@
     <string name="bottom_label_register">Already have an account?</string>
 
     <!-- Group chats screen strings -->
+    <string name="group_chats_label">Group chats</string>
+
+    <!-- Group chat screen strings -->
     <string name="no_messages_yet_label">No messages yet!</string>
     <string name="send_label">SEND</string>
 

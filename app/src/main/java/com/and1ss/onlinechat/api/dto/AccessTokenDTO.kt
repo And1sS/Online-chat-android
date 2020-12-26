@@ -13,4 +13,9 @@ data class AccessTokenDTO(
 ) {
     fun mapToAccessTokenOrThrow(): String =
         accessToken ?: throw InvalidParameterException("Access token is null")
+
+    fun _isCompleted() = accessToken != null && createdAt != null
+
+    val isCompleted: Boolean
+        get() = _isCompleted()
 }

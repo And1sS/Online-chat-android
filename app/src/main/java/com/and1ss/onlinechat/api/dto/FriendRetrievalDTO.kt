@@ -24,8 +24,11 @@ data class FriendRetrievalDTO(
         return requestIssuer?.id?.equals(id) ?: false
     }
 
-    fun isCompleted() =
-        requestIssuer != null && requestIssuer!!.isCompleted()
-                && requestee != null && requestee!!.isCompleted()
+    private fun _isCompleted() =
+        requestIssuer != null && requestIssuer!!.isCompleted
+                && requestee != null && requestee!!.isCompleted
                 && status != null
+
+    val isCompleted: Boolean
+        get() = _isCompleted()
 }

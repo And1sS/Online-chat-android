@@ -22,7 +22,10 @@ data class GroupChatRetrievalDTO(
             creator = creator?.mapToAccountInfoOrThrow()
         )
 
-    fun isCompleted() = id != null && title != null
+    private fun _isCompleted() = id != null && title != null
+
+    val isCompleted: Boolean
+        get() = _isCompleted()
 }
 
 

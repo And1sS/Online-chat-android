@@ -25,7 +25,6 @@ class LauncherActivity : AppCompatActivity() {
     lateinit var sharedPreferencesWrapper: SharedPreferencesWrapper
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //setTheme(R.style.SplashScreenTheme)
         super.onCreate(savedInstanceState)
 
         lifecycle.coroutineScope.launchWhenCreated {
@@ -35,7 +34,8 @@ class LauncherActivity : AppCompatActivity() {
                     restWrapper.saveAccessToken(token)
 
 
-                    val myAccount = restWrapper.getApi().getMyAccount().mapToAccountInfoOrThrow()
+                    val myAccount = restWrapper.getApi()
+                        .getMyAccount().mapToAccountInfoOrThrow()
                     restWrapper.saveMyAccount(myAccount)
 
                     startActivity(MainActivity::class.java)

@@ -45,7 +45,7 @@ class GroupChatsViewModel @ViewModelInject constructor(
         val chats = restWrapper
             .getApi()
             .getAllGroupChats()
-            .filter { it.isCompleted() }
+            .filter { it.isCompleted }
             .sortedByDescending { it.lastMessage?.createdAt?.time ?: 0 }
         _chats.postValue(chats)
     }
@@ -60,8 +60,7 @@ class GroupChatsViewModel @ViewModelInject constructor(
 
     private fun handleWebSocketMessage(message: WebSocketEvent.WebSocketMessage<*>) {
         when (message.messageType) {
-            WebSocketMessageType.GROUP_MESSAGE_CREATE ->
-                handleNewGroupChatMessageCreation(message)
+            WebSocketMessageType.GROUP_MESSAGE_CREATE -> handleNewGroupChatMessageCreation(message)
 
             else -> {
                 Log.d(TAG, "onNewWebSocketEvent: $message")
@@ -72,22 +71,24 @@ class GroupChatsViewModel @ViewModelInject constructor(
     private fun handleNewGroupChatMessageCreation(
         message: WebSocketEvent.WebSocketMessage<*>
     ) {
-        val msg = fromJson<GroupMessageRetrievalDTO>(
-            Gson().toJson(message.payload as LinkedTreeMap<*, *>)
-        )
-
-        if (!msg.isCompleted()) {
-            return
-        }
-
-        val chats = _chats.value
-
-        if (chats != null) {
-            updateChatsWithNewMessage(chats, msg)
-
-            _chats.postValue(
-                chats.sortedByDescending { it.lastMessage?.createdAt?.time ?: 0 }
+        try {
+            val msg = fromJson<GroupMessageRetrievalDTO>(
+                Gson().toJson(message.payload as LinkedTreeMap<*, *>)
             )
+
+            if (!msg.isCompleted) {
+                return
+            }
+
+            val chats = _chats.value
+            if (chats != null) {
+                updateChatsWithNewMessage(chats, msg)
+
+                _chats.postValue(
+                    chats.sortedByDescending { it.lastMessage?.createdAt?.time ?: 0 }
+                )
+            }
+        } catch (e: Exception) {
         }
     }
 

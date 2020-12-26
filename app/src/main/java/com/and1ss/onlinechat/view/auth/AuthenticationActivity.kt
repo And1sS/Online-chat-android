@@ -48,6 +48,10 @@ class AuthenticationActivity : AppCompatActivity(), FragmentChanger, ActivityCha
             .commit()
     }
 
+    override fun navigateBack() {
+        navigateBack()
+    }
+
     override fun transitToActivity(intent: Intent) {
         startActivity(intent)
     }
@@ -56,6 +60,7 @@ class AuthenticationActivity : AppCompatActivity(), FragmentChanger, ActivityCha
 interface FragmentChanger {
     fun transitToFragment(fragment: Fragment)
     fun replaceFragment(fragment: Fragment)
+    fun navigateBack()
 }
 
 interface ActivityChanger {

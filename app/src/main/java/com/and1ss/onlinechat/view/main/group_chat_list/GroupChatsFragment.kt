@@ -2,9 +2,11 @@ package com.and1ss.onlinechat.view.main.group_chat_list
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
@@ -13,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.and1ss.onlinechat.R
 import com.and1ss.onlinechat.api.dto.GroupChatRetrievalDTO
 import com.and1ss.onlinechat.view.auth.FragmentChanger
+import com.and1ss.onlinechat.view.main.HideShowIconInterface
 import com.and1ss.onlinechat.view.main.group_chat.GroupChatFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -39,6 +42,8 @@ class GroupChatsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setHasOptionsMenu(true)
+
         recyclerView.adapter = ChatsAdapter(mutableList)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -52,10 +57,18 @@ class GroupChatsFragment : Fragment() {
         lifecycle.coroutineScope.launch {
             viewModel.getChats()
         }
+
+        (requireActivity() as? HideShowIconInterface)?.showHamburgerIcon()
+        (activity as? AppCompatActivity)?.supportActionBar?.setTitle(R.string.group_chats_label)
     }
 
     companion object {
         fun newInstance() = GroupChatsFragment()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        (requireActivity() as? FragmentChanger)?.navigateBack()
+        return true
     }
 
     inner class ChatsAdapter(private val list: List<GroupChatRetrievalDTO>) :

@@ -22,26 +22,35 @@ class FriendsViewModel @ViewModelInject constructor(
 
     fun getFriends() = viewModelScope.launch {
         withContext(Dispatchers.IO) {
-            val friends = restWrapper.getApi()
-                .getFriends(acceptedOnly = false)
-                .filter { it.isCompleted() }
-            _friends.postValue(friends)
+            try {
+                val friends = restWrapper.getApi()
+                    .getFriends(acceptedOnly = false)
+                    .filter { it.isCompleted }
+                _friends.postValue(friends)
+            } catch (e: Exception) {
+            }
         }
     }
 
     fun deleteFriend(friendId: String) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
-            restWrapper.getApi()
-                .deleteFriend(friendId)
-            getFriends()
+            try {
+                restWrapper.getApi()
+                    .deleteFriend(friendId)
+                getFriends()
+            } catch (e: Exception) {
+            }
         }
     }
 
     fun acceptFriendRequest(friendId: String) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
-            restWrapper.getApi()
-                .acceptFriend(friendId)
-            getFriends()
+            try {
+                restWrapper.getApi()
+                    .acceptFriend(friendId)
+                getFriends()
+            } catch (e: Exception) {
+            }
         }
     }
 }

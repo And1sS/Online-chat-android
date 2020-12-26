@@ -65,10 +65,8 @@ class GroupChatViewModel
                         chatMessages.clear()
                         chatMessages.addAll(
                             messages
-                                .filter { it.isCompleted() }
-                                .sortedByDescending {
-                                    it.createdAt?.time ?: 0
-                                }
+                                .filter { it.isCompleted }
+                                .sortedByDescending { it.createdAt?.time ?: 0 }
                         )
                     }
                     _notifier.postValue(Event.LoadedInitial)

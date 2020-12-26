@@ -9,15 +9,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageButton
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.and1ss.onlinechat.R
-import com.and1ss.onlinechat.api.dto.AccountInfoRetrievalDTO
 import com.and1ss.onlinechat.api.model.AccountInfo
 import com.and1ss.onlinechat.api.rest.RestWrapper
+import com.and1ss.onlinechat.view.main.HideShowIconInterface
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -29,9 +29,8 @@ class AddNewFriendsFragment : Fragment(), AddNewFriendsAdapter.AddFriendsCallbac
     private val viewModel: AddNewFriendsViewModel by viewModels()
 
     private lateinit var recyclerView: RecyclerView
-    private var mutableList: MutableList<AccountInfoRetrievalDTO> = mutableListOf()
+    private var mutableList: MutableList<AccountInfo> = mutableListOf()
 
-    private lateinit var backButton: ImageButton
     private lateinit var searchButton: Button
 
     private lateinit var editText: EditText
@@ -44,7 +43,6 @@ class AddNewFriendsFragment : Fragment(), AddNewFriendsAdapter.AddFriendsCallbac
         val view = inflater.inflate(R.layout.fragment_add_friends, container, false)
 
         recyclerView = view.findViewById(R.id.recycler_view)
-        backButton = view.findViewById(R.id.back_button)
         searchButton = view.findViewById(R.id.search_button)
         editText = view.findViewById(R.id.search_input)
 
@@ -81,9 +79,8 @@ class AddNewFriendsFragment : Fragment(), AddNewFriendsAdapter.AddFriendsCallbac
     }
 
     private fun setUpToolbar() {
-        backButton.setOnClickListener {
-            activity?.onBackPressed()
-        }
+        (requireActivity() as? HideShowIconInterface)?.showBackIcon()
+        (requireActivity() as? AppCompatActivity)?.supportActionBar?.setTitle(R.string.add_new_friends_label)
     }
 
     private fun setUpObservers() {

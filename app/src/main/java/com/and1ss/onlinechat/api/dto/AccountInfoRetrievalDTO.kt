@@ -12,7 +12,10 @@ data class AccountInfoRetrievalDTO(
     fun mapToAccountInfoOrThrow() =
         AccountInfo(id!!, name!!, surname!!, login!!)
 
-    fun isCompleted() = id != null && login != null && name != null && surname != null
+    private fun _isCompleted() = id != null && login != null && name != null && surname != null
+
+    val isCompleted: Boolean
+        get() = _isCompleted()
 
     private fun _getInitials(): String {
         val nameLetter = name ?: ""

@@ -10,21 +10,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.and1ss.onlinechat.R
 import com.and1ss.onlinechat.api.model.GroupChat
+import com.and1ss.onlinechat.view.main.HideShowIconInterface
 import dagger.hilt.android.AndroidEntryPoint
 
 
 private const val TAG = "GroupChatFragment"
 
-private const val MAX_TITLE_LENGTH = 30
+private const val MAX_TITLE_LENGTH = 20
 
 @AndroidEntryPoint
 class GroupChatFragment : Fragment() {
@@ -35,11 +34,6 @@ class GroupChatFragment : Fragment() {
     private lateinit var messageEditText: EditText
 
     private lateinit var sendButton: Button
-    private lateinit var backButton: ImageButton
-
-    private lateinit var chatTitleTextView: TextView
-
-    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,10 +54,7 @@ class GroupChatFragment : Fragment() {
 
         messageEditText = view.findViewById(R.id.message_input)
         sendButton = view.findViewById(R.id.send_message_button)
-        backButton = view.findViewById(R.id.back_button)
         recyclerView = view.findViewById(R.id.recycler_view)
-        chatTitleTextView = view.findViewById(R.id.chat_title_label)
-        toolbar = view.findViewById(R.id.toolbar)
 
         return view
     }
@@ -71,13 +62,17 @@ class GroupChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.getAllMessages()
         setUpObservers()
 
         setUpToolbar()
         setUpMessageInput()
         setUpRecyclerView()
+        setUpSendButton()
 
+        viewModel.getAllMessages()
+    }
+
+    private fun setUpSendButton() {
         sendButton.setOnClickListener {
             viewModel.send(viewModel.messageString)
             messageEditText.setText("")
@@ -91,11 +86,8 @@ class GroupChatFragment : Fragment() {
         } else {
             viewModel.chat.title
         }
-        chatTitleTextView.text = title
-
-        backButton.setOnClickListener {
-            activity?.onBackPressed()
-        }
+        (requireActivity() as? HideShowIconInterface)?.showBackIcon()
+        (requireActivity() as? AppCompatActivity)?.supportActionBar?.title = title
     }
 
     private fun setUpMessageInput() {

@@ -10,12 +10,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.amulyakhare.textdrawable.TextDrawable
 import com.and1ss.onlinechat.R
-import com.and1ss.onlinechat.api.dto.AccountInfoRetrievalDTO
 import com.and1ss.onlinechat.api.model.AccountInfo
 import com.and1ss.onlinechat.util.stringToColor
 
 class AddNewFriendsAdapter(
-    private val list: List<AccountInfoRetrievalDTO>,
+    private val list: List<AccountInfo>,
     private val callback: AddFriendsCallback
 ) : RecyclerView.Adapter<AddNewFriendsAdapter.FriendItemHolder>() {
     interface AddFriendsCallback {
@@ -30,8 +29,7 @@ class AddNewFriendsAdapter(
         private val profileLoginTextView: TextView = itemView.findViewById(R.id.profile_login)
         private val statusButton: Button = itemView.findViewById(R.id.status_button)
 
-        fun bind(friend: AccountInfoRetrievalDTO) {
-            val friend = friend.mapToAccountInfoOrThrow()
+        fun bind(friend: AccountInfo) {
             image.setImageDrawable(
                 TextDrawable.builder()
                     .buildRound(friend.initials, stringToColor(friend.nameSurname))

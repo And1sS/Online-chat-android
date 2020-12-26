@@ -29,8 +29,6 @@ data class AccountInfo(
     val initials: String
         get() = _getInitials()
 
-    private fun _getNameSurname() = "$name $surname"
-
     val nameSurname: String
-        get() = _getNameSurname()
+        get() = "$name $surname"
 }
