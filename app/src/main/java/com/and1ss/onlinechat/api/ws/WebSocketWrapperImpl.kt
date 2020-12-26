@@ -3,7 +3,7 @@ package com.and1ss.onlinechat.api.ws
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.and1ss.onlinechat.api.rest.rest_wrapper.RestWrapper
+import com.and1ss.onlinechat.api.rest.RestWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -17,7 +17,7 @@ import javax.inject.Inject
 private const val TAG = "WebSocketWrapper"
 
 private const val NUM_OF_THREADS = 1
-private const val REMOTE_HOST_URL = "ws://176.36.243.160:8080/api/ws"
+private const val REMOTE_HOST_URL = "ws://10.0.2.2:8080/api/ws"
 private const val AUTHORIZATION_HEADER = "Authorization"
 private const val BEARER_PREFIX = "Bearer "
 
@@ -28,9 +28,6 @@ class WebSocketWrapperImpl @Inject constructor(
     private lateinit var webSocket: WebSocket
 
     private var isConnected: AtomicBoolean = AtomicBoolean(false)
-
-    @Volatile
-    private var isReconnecting: Boolean = false
 
     private val webSocketListener: WebSocketListener = ChatWebSocketListener()
 
@@ -73,18 +70,12 @@ class WebSocketWrapperImpl @Inject constructor(
 
     private fun CoroutineScope.reconnect() {
         launch {
-            if (isReconnecting) {
-                return@launch
-            }
-
             delay(5000)
 
             eventBus.postValue(WebSocketEvent.ReconnectionAttempt)
             Log.d(TAG, "reconnection attempt")
 
-            isReconnecting = true
             webSocket.cancel()
-            isConnected.set(false)
             connect()
         }
     }
@@ -94,15 +85,15 @@ class WebSocketWrapperImpl @Inject constructor(
         override fun onOpen(webSocket: WebSocket, response: Response) {
             Log.i(TAG, "onOpen: $webSocket")
             eventBus.postValue(WebSocketEvent.ConnectionOpening)
-            isReconnecting = false
             isConnected.set(true)
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             Log.e(TAG, "onFailure: ${t.message} ${response.toString()}")
-            CoroutineScope(dispatcher).reconnect()
-
+            isConnected.set(false)
             eventBus.postValue(WebSocketEvent.ConnectionFailure)
+
+            CoroutineScope(dispatcher).reconnect()
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {

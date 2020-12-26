@@ -1,8 +1,7 @@
-package com.and1ss.onlinechat.api.rest.rest_wrapper
+package com.and1ss.onlinechat.api.rest
 
 import com.and1ss.onlinechat.api.dto.LoginInfoDTO
 import com.and1ss.onlinechat.api.model.AccountInfo
-import com.and1ss.onlinechat.api.rest.ApiEndpoints
 
 interface RestWrapper {
     suspend fun login(loginCredentials: LoginInfoDTO)

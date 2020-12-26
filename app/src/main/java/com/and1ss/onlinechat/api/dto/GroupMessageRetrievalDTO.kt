@@ -13,4 +13,8 @@ data class GroupMessageRetrievalDTO(
     var contents: String? = null,
 
     @SerializedName("created_at") val createdAt: Timestamp? = null
-)
+) {
+    fun isCompleted() = id != null && author != null
+            && author!!.isCompleted() && chatId != null
+            && contents != null
+}

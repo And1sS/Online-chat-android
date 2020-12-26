@@ -31,4 +31,9 @@
     <!-- Group chats screen strings -->
     <string name="no_messages_yet_label">No messages yet!</string>
     <string name="send_label">SEND</string>
+
+    <!-- Friends screen strings -->
+    <string name="friends_label">Friends</string>
+    <string name="search_label">Search</string>
+    <string name="add_new_friends_label">Add new friends</string>
 </resources>

@@ -1,7 +1,7 @@
 package com.and1ss.onlinechat.di
 
-import com.and1ss.onlinechat.api.rest.rest_wrapper.RestWrapper
-import com.and1ss.onlinechat.api.rest.rest_wrapper.RestWrapperImpl
+import com.and1ss.onlinechat.api.rest.RestWrapper
+import com.and1ss.onlinechat.api.rest.RestWrapperImpl
 import com.and1ss.onlinechat.util.shared_preferences.SharedPreferencesWrapper
 import dagger.Module
 import dagger.Provides

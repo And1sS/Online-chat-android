@@ -1,6 +1,6 @@
 package com.and1ss.onlinechat.di
 
-import com.and1ss.onlinechat.api.rest.rest_wrapper.RestWrapper
+import com.and1ss.onlinechat.api.rest.RestWrapper
 import com.and1ss.onlinechat.api.ws.WebSocketWrapper
 import com.and1ss.onlinechat.api.ws.WebSocketWrapperImpl
 import dagger.Module
@@ -18,8 +18,8 @@ class WebSocketModule {
     @Singleton
     fun getClient(): OkHttpClient = OkHttpClient
         .Builder()
-        .pingInterval(5, TimeUnit.SECONDS)
-        .connectTimeout(10, TimeUnit.SECONDS)
+        .pingInterval(2, TimeUnit.SECONDS)
+        .connectTimeout(5, TimeUnit.SECONDS)
         .build()
 
     @Provides

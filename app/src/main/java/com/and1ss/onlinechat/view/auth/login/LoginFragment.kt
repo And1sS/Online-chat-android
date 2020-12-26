@@ -86,7 +86,7 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private inline fun showInvalidCredentialsToast() {
+    private fun showInvalidCredentialsToast() {
         Toast.makeText(
             requireContext(),
             R.string.incorrect_credentials_toast,
@@ -94,7 +94,7 @@ class LoginFragment : Fragment() {
         ).show()
     }
 
-    private inline fun showConnectionFailedToast() {
+    private fun showConnectionFailedToast() {
         Toast.makeText(
             requireContext(),
             R.string.failed_to_connect_toast,
@@ -102,7 +102,7 @@ class LoginFragment : Fragment() {
         ).show()
     }
 
-    private inline fun transitToMainActivity() {
+    private fun transitToMainActivity() {
         context
             ?.let { MainActivity.newIntent(it) }
             ?.let { (activity as? ActivityChanger)?.transitToActivity(it) }

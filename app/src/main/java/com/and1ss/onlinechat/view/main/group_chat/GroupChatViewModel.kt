@@ -7,7 +7,7 @@ import com.and1ss.onlinechat.api.dto.GroupMessageCreationDTO
 import com.and1ss.onlinechat.api.dto.GroupMessageRetrievalDTO
 import com.and1ss.onlinechat.api.model.AccountInfo
 import com.and1ss.onlinechat.api.model.GroupChat
-import com.and1ss.onlinechat.api.rest.rest_wrapper.RestWrapper
+import com.and1ss.onlinechat.api.rest.RestWrapper
 import com.and1ss.onlinechat.api.ws.WebSocketEvent
 import com.and1ss.onlinechat.api.ws.WebSocketMessageType
 import com.and1ss.onlinechat.api.ws.WebSocketWrapper
@@ -51,26 +51,28 @@ class GroupChatViewModel
         webSocketWrapper.send(webSocketMessageToJson(webSocketMessage))
     }
 
-    suspend fun getAllMessages() = withContext(Dispatchers.IO) {
-        val messages = try {
-            restWrapper.getApi().getAllMessagesForGroupChat(chat.id)
-        } catch (e: Exception) {
-            null
-        }
+    fun getAllMessages() = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            val messages = try {
+                restWrapper.getApi().getAllMessagesForGroupChat(chat.id)
+            } catch (e: Exception) {
+                null
+            }
 
-        messages?.let {
-            withContext(Dispatchers.Default) {
-                synchronized(chatMessages) {
-                    chatMessages.clear()
-                    chatMessages.addAll(
-                        messages
-                            .filter { it.createdAt?.time != null }
-                            .sortedByDescending {
-                                it.createdAt?.time ?: 0
-                            }
-                    )
+            messages?.let {
+                withContext(Dispatchers.Default) {
+                    synchronized(chatMessages) {
+                        chatMessages.clear()
+                        chatMessages.addAll(
+                            messages
+                                .filter { it.isCompleted() }
+                                .sortedByDescending {
+                                    it.createdAt?.time ?: 0
+                                }
+                        )
+                    }
+                    _notifier.postValue(Event.LoadedInitial)
                 }
-                _notifier.postValue(Event.LoadedInitial)
             }
         }
     }

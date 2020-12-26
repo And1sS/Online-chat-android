@@ -11,6 +11,6 @@ data class AccessTokenDTO(
     @SerializedName("created_at")
     var createdAt: Timestamp? = null
 ) {
-    fun mapToAccessToken(): String =
+    fun mapToAccessTokenOrThrow(): String =
         accessToken ?: throw InvalidParameterException("Access token is null")
 }

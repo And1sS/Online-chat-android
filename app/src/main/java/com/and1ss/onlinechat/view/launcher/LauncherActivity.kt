@@ -4,8 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.coroutineScope
-import com.and1ss.onlinechat.api.model.AccountInfo
-import com.and1ss.onlinechat.api.rest.rest_wrapper.RestWrapper
+import com.and1ss.onlinechat.api.rest.RestWrapper
 import com.and1ss.onlinechat.util.shared_preferences.SharedPreferencesWrapper
 import com.and1ss.onlinechat.view.auth.AuthenticationActivity
 import com.and1ss.onlinechat.view.main.MainActivity
@@ -36,14 +35,8 @@ class LauncherActivity : AppCompatActivity() {
                     restWrapper.saveAccessToken(token)
 
 
-                    val myAccount = restWrapper.getApi().getMyAccount()
-                    restWrapper.saveMyAccount(
-                        AccountInfo(
-                            id = myAccount.id!!,
-                            name = myAccount.name!!,
-                            surname = myAccount.surname!!
-                        )
-                    )
+                    val myAccount = restWrapper.getApi().getMyAccount().mapToAccountInfoOrThrow()
+                    restWrapper.saveMyAccount(myAccount)
 
                     startActivity(MainActivity::class.java)
                 } catch (e: ConnectException) {

@@ -9,7 +9,7 @@ import com.and1ss.onlinechat.R
 import com.and1ss.onlinechat.api.ws.WebSocketWrapper
 import com.and1ss.onlinechat.view.auth.ActivityChanger
 import com.and1ss.onlinechat.view.auth.FragmentChanger
-import com.and1ss.onlinechat.view.main.group_chat_list.GroupChatsFragment
+import com.and1ss.onlinechat.view.main.friends.FriendsFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity(), FragmentChanger, ActivityChanger {
 
         if (supportFragmentManager.findFragmentById(R.id.fragment_container) == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, GroupChatsFragment.newInstance())
+                .replace(R.id.fragment_container, FriendsFragment.newInstance())
                 .commit()
         }
     }
@@ -43,8 +43,8 @@ class MainActivity : AppCompatActivity(), FragmentChanger, ActivityChanger {
                 R.anim.fragment_close_enter,
                 R.anim.fragment_close_exit
             )
-            .replace(R.id.fragment_container, fragment)
             .addToBackStack(null)
+            .replace(R.id.fragment_container, fragment)
             .commit()
     }
 

@@ -62,8 +62,7 @@ class GroupChatsFragment : Fragment() {
         RecyclerView.Adapter<ChatsAdapter.GroupChatItemHolder>() {
         inner class GroupChatItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             private lateinit var chat: GroupChatRetrievalDTO
-            private val chatTitleTextView: TextView =
-                itemView.findViewById(R.id.chat_title_label)
+            private val chatTitleTextView: TextView = itemView.findViewById(R.id.chat_title_label)
             private val chatLastMessageTextView: TextView =
                 itemView.findViewById(R.id.last_message_label)
             private val chatLastMessageTimeTextView: TextView =
@@ -80,19 +79,17 @@ class GroupChatsFragment : Fragment() {
             fun bind(chat: GroupChatRetrievalDTO) {
                 chatTitleTextView.text = chat.title
 
-                chatLastMessageTimeTextView.text =
-                    if (chat.lastMessage?.createdAt != null) {
-                        chat.lastMessage!!.createdAt.toString()
-                    } else {
-                        ""
-                    }
+                chatLastMessageTimeTextView.text = if (chat.lastMessage?.createdAt != null) {
+                    chat.lastMessage!!.createdAt.toString()
+                } else {
+                    ""
+                }
 
-                chatLastMessageTextView.text =
-                    if (chat.lastMessage != null) {
-                        chat.lastMessage!!.contents
-                    } else {
-                        resources.getString(R.string.no_messages_yet_label)
-                    }
+                chatLastMessageTextView.text = if (chat.lastMessage != null) {
+                    chat.lastMessage!!.contents
+                } else {
+                    resources.getString(R.string.no_messages_yet_label)
+                }
 
                 this.chat = chat
             }

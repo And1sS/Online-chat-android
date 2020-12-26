@@ -15,13 +15,11 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.and1ss.onlinechat.R
 import com.and1ss.onlinechat.api.model.GroupChat
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 
 private const val TAG = "GroupChatFragment"
@@ -73,7 +71,7 @@ class GroupChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loadInitialMessages()
+        viewModel.getAllMessages()
         setUpObservers()
 
         setUpToolbar()
@@ -126,12 +124,6 @@ class GroupChatFragment : Fragment() {
                 context = requireContext(),
                 me = viewModel.myAccount
             )
-        }
-    }
-
-    private fun loadInitialMessages() {
-        lifecycle.coroutineScope.launch {
-            viewModel.getAllMessages()
         }
     }
 

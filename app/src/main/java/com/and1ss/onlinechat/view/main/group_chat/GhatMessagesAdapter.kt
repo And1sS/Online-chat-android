@@ -29,18 +29,15 @@ class ChatMessagesAdapter(
 
         class GroupMessageLeftItemHolder(itemView: View, dateFormat: SimpleDateFormat) :
             MessageViewHolder(itemView, dateFormat) {
-            private val image: ImageView =
-                itemView.findViewById(R.id.image_message_profile)
-            private val authorTextView: TextView =
-                itemView.findViewById(R.id.message_author_label)
-            private val contentTextView: TextView =
-                itemView.findViewById(R.id.message_body_label)
+            private val image: ImageView = itemView.findViewById(R.id.image_message_profile)
+            private val authorTextView: TextView = itemView.findViewById(R.id.message_author_label)
+            private val contentTextView: TextView = itemView.findViewById(R.id.message_body_label)
             private val messageTimeTextView: TextView =
                 itemView.findViewById(R.id.message_time_label)
 
             override fun bind(message: GroupMessageRetrievalDTO) {
-                val initials = message.author?.getInitials() ?: ""
-                val nameSurname = message.author?.name ?: "" + " " + message.author?.surname
+                val initials = message.author?.initials ?: ""
+                val nameSurname = (message.author?.name ?: "") + " " + message.author?.surname
 
                 image.setImageDrawable(
                     TextDrawable.builder()
@@ -48,30 +45,26 @@ class ChatMessagesAdapter(
                 )
                 authorTextView.text = nameSurname
                 contentTextView.text = message.contents
-                messageTimeTextView.text =
-                    if (message.createdAt != null) {
-                        dateFormat.format(message.createdAt).toString()
-                    } else {
-                        ""
-                    }
+                messageTimeTextView.text = if (message.createdAt != null) {
+                    dateFormat.format(message.createdAt).toString()
+                } else {
+                    ""
+                }
             }
         }
 
         class GroupMessageRightItemHolder(itemView: View, dateFormat: SimpleDateFormat) :
             MessageViewHolder(itemView, dateFormat) {
-            private val contentTextView: TextView =
-                itemView.findViewById(R.id.message_body_label)
+            private val contentTextView: TextView = itemView.findViewById(R.id.message_body_label)
             private val messageTimeTextView: TextView =
                 itemView.findViewById(R.id.message_time_label)
 
             override fun bind(message: GroupMessageRetrievalDTO) {
-                messageTimeTextView.text =
-                    if (message.createdAt != null) {
-                        dateFormat.format(message.createdAt).toString() + " "
-                    } else {
-                        ""
-                    }
-
+                messageTimeTextView.text = if (message.createdAt != null) {
+                    dateFormat.format(message.createdAt).toString() + " "
+                } else {
+                    ""
+                }
                 contentTextView.text = message.contents
             }
         }

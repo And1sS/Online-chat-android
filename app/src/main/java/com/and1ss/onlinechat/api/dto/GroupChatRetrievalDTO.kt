@@ -21,6 +21,8 @@ data class GroupChatRetrievalDTO(
             about = about,
             creator = creator?.mapToAccountInfoOrThrow()
         )
+
+    fun isCompleted() = id != null && title != null
 }
 
 

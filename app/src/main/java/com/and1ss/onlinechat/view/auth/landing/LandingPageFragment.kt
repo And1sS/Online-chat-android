@@ -41,7 +41,7 @@ class LandingPageFragment : Fragment() {
     }
 
     private fun transitToAnotherFragment(fragment: Fragment) {
-        (activity as? FragmentChanger)?.transitToFragment(fragment)
+        (activity as? FragmentChanger)?.replaceFragment(fragment)
     }
 
     companion object {

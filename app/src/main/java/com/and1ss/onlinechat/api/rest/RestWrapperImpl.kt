@@ -1,8 +1,7 @@
-package com.and1ss.onlinechat.api.rest.rest_wrapper
+package com.and1ss.onlinechat.api.rest
 
 import com.and1ss.onlinechat.api.dto.LoginInfoDTO
 import com.and1ss.onlinechat.api.model.AccountInfo
-import com.and1ss.onlinechat.api.rest.ApiEndpoints
 import com.and1ss.onlinechat.util.shared_preferences.SharedPreferencesWrapper
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 
 
-private const val BASE_URL = "http://176.36.243.160:8080/api/"
+private const val BASE_URL = "http://10.0.2.2:8080/api/"
 private const val TAG = "Repository"
 
 
@@ -55,7 +54,7 @@ class RestWrapperImpl
 
     override suspend fun login(loginCredentials: LoginInfoDTO) =
         withContext(Dispatchers.IO) {
-            saveAccessToken(api.login(loginCredentials).mapToAccessToken())
+            saveAccessToken(api.login(loginCredentials).mapToAccessTokenOrThrow())
             saveMyAccount(api.getMyAccount().mapToAccountInfoOrThrow())
         }
 

@@ -31,8 +31,8 @@ class AuthenticationActivity : AppCompatActivity(), FragmentChanger, ActivityCha
                 R.anim.fragment_close_enter,
                 R.anim.fragment_close_exit
             )
-            .replace(R.id.fragment_container, fragment)
             .addToBackStack(null)
+            .replace(R.id.fragment_container, fragment)
             .commit()
     }
 
