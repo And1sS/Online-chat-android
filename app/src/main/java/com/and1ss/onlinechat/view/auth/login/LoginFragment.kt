@@ -14,12 +14,10 @@ import androidx.lifecycle.coroutineScope
 import com.and1ss.onlinechat.R
 import com.and1ss.onlinechat.view.auth.ActivityChanger
 import com.and1ss.onlinechat.view.auth.FragmentChanger
+import com.and1ss.onlinechat.view.auth.register.RegisterFragment
 import com.and1ss.onlinechat.view.main.MainActivity
-import com.studa.android.client.view.auth.register.RegisterFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.net.ConnectException
 
 private const val TAG = "LoginFragment"
@@ -70,9 +68,6 @@ class LoginFragment : Fragment() {
 
                 try {
                     viewModel.login()
-                    withContext(Dispatchers.Main) {
-                        transitToMainActivity()
-                    }
                 } catch (e: ConnectException) {
                     showConnectionFailedToast()
                 } catch (e: Exception) {
@@ -83,6 +78,16 @@ class LoginFragment : Fragment() {
 
         registerButton.setOnClickListener {
             (activity as? FragmentChanger)?.replaceFragment(RegisterFragment.newInstance())
+        }
+
+        viewModel.loginConfirmation.observe(viewLifecycleOwner) {
+            when (it) {
+                LoginViewModel.State.LOGGED_IN -> transitToMainActivity()
+                LoginViewModel.State.FAILED ->
+                    Toast.makeText(requireContext(), "Failed to log in", Toast.LENGTH_SHORT).show()
+                else -> {
+                }
+            }
         }
     }
 

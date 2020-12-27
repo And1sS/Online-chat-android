@@ -29,5 +29,13 @@ class SharedPreferencesWrapperImpl
             ).getString(ACCESS_TOKEN, null)!!
         }
 
+    override suspend fun deleteAccessToken() =
+        withContext(Dispatchers.Default) {
+            applicationContext.getSharedPreferences(
+                SHARED_PREFERENCES, Activity.MODE_PRIVATE
+            ).edit()
+                .remove(ACCESS_TOKEN)
+                .apply()
+        }
 }
 

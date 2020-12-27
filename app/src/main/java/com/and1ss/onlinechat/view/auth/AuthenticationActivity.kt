@@ -1,5 +1,6 @@
 package com.and1ss.onlinechat.view.auth
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -55,6 +56,18 @@ class AuthenticationActivity : AppCompatActivity(), FragmentChanger, ActivityCha
     override fun transitToActivity(intent: Intent) {
         startActivity(intent)
     }
+
+    override fun <T> startActivity(clazz: Class<T>) {
+        val intent = Intent(this, clazz).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+        }
+        startActivity(intent)
+    }
+
+    companion object {
+        fun newIntent(packageContext: Context) =
+            Intent(packageContext, AuthenticationActivity::class.java)
+    }
 }
 
 interface FragmentChanger {
@@ -65,4 +78,5 @@ interface FragmentChanger {
 
 interface ActivityChanger {
     fun transitToActivity(intent: Intent)
+    fun <T> startActivity(clazz: Class<T>)
 }

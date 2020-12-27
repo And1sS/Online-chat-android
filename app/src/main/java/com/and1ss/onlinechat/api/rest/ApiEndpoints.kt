@@ -10,6 +10,9 @@ private const val GROUP_CHAT_SERVICE = "group-chat-service/chats"
 private const val PRIVATE_CHAT_SERVICE = "private-chat-service/chats"
 
 interface ApiEndpoints {
+    @POST("$AUTH_SERVICE/register")
+    suspend fun register(@Body registerInfoDTO: RegisterInfoDTO): AccountInfoRetrievalDTO
+
     @PUT("$AUTH_SERVICE/login")
     suspend fun login(@Body loginCredentials: LoginInfoDTO): AccessTokenDTO
 

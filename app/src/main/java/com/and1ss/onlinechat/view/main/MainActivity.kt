@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -13,17 +14,20 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.coroutineScope
 import com.and1ss.onlinechat.R
 import com.and1ss.onlinechat.api.rest.RestWrapper
 import com.and1ss.onlinechat.api.ws.WebSocketWrapper
+import com.and1ss.onlinechat.util.shared_preferences.SharedPreferencesWrapper
 import com.and1ss.onlinechat.view.auth.ActivityChanger
+import com.and1ss.onlinechat.view.auth.AuthenticationActivity
 import com.and1ss.onlinechat.view.auth.FragmentChanger
 import com.and1ss.onlinechat.view.main.friends.FriendsFragment
 import com.and1ss.onlinechat.view.main.group_chat_list.GroupChatsFragment
 import com.and1ss.onlinechat.view.main.private_chat_list.PrivateChatsFragment
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -31,9 +35,12 @@ private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), FragmentChanger,
-    ActivityChanger, HideShowIconInterface, FragmentManagerProvider {
+    ActivityChanger, HideShowIconInterface {
     @Inject
     lateinit var webSocketWrapper: WebSocketWrapper
+
+    @Inject
+    lateinit var sharedPreferencesWrapper: SharedPreferencesWrapper
 
     @Inject
     lateinit var restWrapper: RestWrapper
@@ -45,6 +52,7 @@ class MainActivity : AppCompatActivity(), FragmentChanger,
     private lateinit var navDrawerToggle: ActionBarDrawerToggle
     private lateinit var drawerLayout: DrawerLayout
 
+    private lateinit var logoutButton: Button
     private lateinit var nameSurnameTextView: TextView
     private lateinit var loginTextView: TextView
 
@@ -68,6 +76,7 @@ class MainActivity : AppCompatActivity(), FragmentChanger,
         val hView: View = navigationView.getHeaderView(0)
         nameSurnameTextView = hView.findViewById(R.id.name_surname_title)
         loginTextView = hView.findViewById(R.id.login_title)
+        logoutButton = hView.findViewById(R.id.logout_button)
     }
 
     private fun setUpProfileTextViews() {
@@ -107,6 +116,12 @@ class MainActivity : AppCompatActivity(), FragmentChanger,
         }
         drawerLayout.apply { addDrawerListener(navDrawerToggle) }
         navDrawerToggle.syncState()
+        logoutButton.setOnClickListener {
+            lifecycle.coroutineScope.launch {
+                sharedPreferencesWrapper.deleteAccessToken()
+                startActivity(AuthenticationActivity::class.java)
+            }
+        }
     }
 
     private fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
@@ -174,6 +189,13 @@ class MainActivity : AppCompatActivity(), FragmentChanger,
 
     override fun transitToActivity(intent: Intent) = startActivity(intent)
 
+    override fun <T> startActivity(clazz: Class<T>) {
+        val intent = Intent(this, clazz).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+        }
+        startActivity(intent)
+    }
+
     override fun showHamburgerIcon() {
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
         navDrawerToggle.isDrawerIndicatorEnabled = true
@@ -188,15 +210,9 @@ class MainActivity : AppCompatActivity(), FragmentChanger,
         fun newIntent(packageContext: Context) =
             Intent(packageContext, MainActivity::class.java)
     }
-
-    override fun getActivityFragmentManager() = supportFragmentManager
 }
 
 interface HideShowIconInterface {
     fun showHamburgerIcon()
     fun showBackIcon()
-}
-
-interface FragmentManagerProvider {
-    fun getActivityFragmentManager(): FragmentManager
 }

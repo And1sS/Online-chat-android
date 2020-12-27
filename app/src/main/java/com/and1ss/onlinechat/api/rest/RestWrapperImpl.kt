@@ -46,12 +46,7 @@ class RestWrapperImpl
         api = retrofit.create(ApiEndpoints::class.java)
     }
 
-    override fun getApi(): ApiEndpoints {
-        if (accessToken.isEmpty()) {
-            throw IllegalStateException("Api consuming without logging")
-        }
-        return api
-    }
+    override fun getApi(): ApiEndpoints = api
 
     override suspend fun login(loginCredentials: LoginInfoDTO) =
         withContext(Dispatchers.IO) {

@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import com.and1ss.onlinechat.R
 import com.and1ss.onlinechat.view.auth.FragmentChanger
 import com.and1ss.onlinechat.view.auth.login.LoginFragment
-import com.studa.android.client.view.auth.register.RegisterFragment
+import com.and1ss.onlinechat.view.auth.register.RegisterFragment
 
 class LandingPageFragment : Fragment() {
     private lateinit var loginButton: Button
