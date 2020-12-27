@@ -20,6 +20,9 @@ interface ApiEndpoints {
         @Query("login_like") loginLike: String
     ): List<AccountInfoRetrievalDTO>
 
+    @POST(GROUP_CHAT_SERVICE)
+    suspend fun createGroupChat(@Body groupChatCreationDTO: GroupChatCreationDTO): GroupChatRetrievalDTO
+
     @GET("$GROUP_CHAT_SERVICE/all")
     suspend fun getAllGroupChats(): List<GroupChatRetrievalDTO>
 

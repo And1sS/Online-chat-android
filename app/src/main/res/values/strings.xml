@@ -43,4 +43,8 @@
     <string name="friends_label">Friends</string>
     <string name="search_label">Search</string>
     <string name="add_new_friends_label">Add new friends</string>
+
+    <!-- Group chat creation screen strings -->
+    <string name="group_chat_creation_label">Create group chat</string>
+
 </resources>

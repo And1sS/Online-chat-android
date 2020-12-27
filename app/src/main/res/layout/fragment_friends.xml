@@ -25,8 +25,10 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@color/teal_200"
+        android:backgroundTint="@color/teal_200"
         android:src="@mipmap/plus_32dp"
+        app:tint="@null"
+        android:backgroundTintMode="src_over"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

@@ -34,7 +34,9 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
-        app:itemBackground="@android:color/transparent"
+        app:itemBackground="@drawable/nav_item"
+        app:itemIconPadding="16dp"
+        app:itemHorizontalPadding="10dp"
         app:itemIconTint="@color/drawer_item"
         app:itemTextColor="@color/drawer_item"
         app:menu="@menu/drawer_menu" />

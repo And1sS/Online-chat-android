@@ -24,12 +24,20 @@ class AddNewFriendsAdapter(
     }
 
     inner class FriendItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private lateinit var friend: AccountInfo
         private val image: ImageView = itemView.findViewById(R.id.image_profile)
         private val profileTextView: TextView = itemView.findViewById(R.id.profile_label)
         private val profileLoginTextView: TextView = itemView.findViewById(R.id.profile_login)
         private val statusButton: Button = itemView.findViewById(R.id.status_button)
 
+        init {
+            statusButton.setOnClickListener {
+                callback.sendFriendRequest(friend.id)
+            }
+        }
+
         fun bind(friend: AccountInfo) {
+            this.friend = friend
             image.setImageDrawable(
                 TextDrawable.builder()
                     .buildRound(friend.initials, stringToColor(friend.nameSurname))
@@ -38,9 +46,6 @@ class AddNewFriendsAdapter(
             profileLoginTextView.text = friend.login
 
             statusButton.text = "Add"
-            statusButton.setOnClickListener {
-                callback.sendFriendRequest(friend.id)
-            }
         }
     }
 

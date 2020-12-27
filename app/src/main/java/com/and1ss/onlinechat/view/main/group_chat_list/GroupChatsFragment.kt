@@ -17,6 +17,8 @@ import com.and1ss.onlinechat.api.dto.GroupChatRetrievalDTO
 import com.and1ss.onlinechat.view.auth.FragmentChanger
 import com.and1ss.onlinechat.view.main.HideShowIconInterface
 import com.and1ss.onlinechat.view.main.group_chat.GroupChatFragment
+import com.and1ss.onlinechat.view.main.group_chat_creation.GroupChatCreationFragment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -27,6 +29,8 @@ class GroupChatsFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private var mutableList: MutableList<GroupChatRetrievalDTO> = mutableListOf()
 
+    private lateinit var addButton: FloatingActionButton
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,6 +39,7 @@ class GroupChatsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_chats, container, false)
 
         recyclerView = view.findViewById(R.id.recycler_view)
+        addButton = view.findViewById(R.id.add_button)
 
         return view
     }
@@ -60,6 +65,10 @@ class GroupChatsFragment : Fragment() {
 
         (requireActivity() as? HideShowIconInterface)?.showHamburgerIcon()
         (activity as? AppCompatActivity)?.supportActionBar?.setTitle(R.string.group_chats_label)
+
+        addButton.setOnClickListener {
+            (activity as? FragmentChanger)?.transitToFragment(GroupChatCreationFragment.newInstance())
+        }
     }
 
     companion object {

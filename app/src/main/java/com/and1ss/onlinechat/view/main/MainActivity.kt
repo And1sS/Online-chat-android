@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +14,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.and1ss.onlinechat.R
+import com.and1ss.onlinechat.api.rest.RestWrapper
 import com.and1ss.onlinechat.api.ws.WebSocketWrapper
 import com.and1ss.onlinechat.view.auth.ActivityChanger
 import com.and1ss.onlinechat.view.auth.FragmentChanger
@@ -21,6 +24,7 @@ import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+
 private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
@@ -28,20 +32,44 @@ class MainActivity : AppCompatActivity(), FragmentChanger, ActivityChanger, Hide
     @Inject
     lateinit var webSocketWrapper: WebSocketWrapper
 
+    @Inject
+    lateinit var restWrapper: RestWrapper
+
     private val viewModel: MainActivityViewModel by viewModels()
 
     private lateinit var toolbar: Toolbar
+    private lateinit var navigationView: NavigationView
     private lateinit var navDrawerToggle: ActionBarDrawerToggle
     private lateinit var drawerLayout: DrawerLayout
+
+    private lateinit var nameSurnameTextView: TextView
+    private lateinit var loginTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initWebSocketConnection()
+        setUpViewReferences()
         initToolbar()
         initNavigationDrawer()
+        setUpProfileTextViews()
+
+        initWebSocketConnection()
         initStartingFragment()
+    }
+
+    private fun setUpViewReferences() {
+        toolbar = findViewById(R.id.toolbar)
+        navigationView = findViewById(R.id.nav_view)
+        drawerLayout = findViewById(R.id.drawer_layout)
+        val hView: View = navigationView.getHeaderView(0)
+        nameSurnameTextView = hView.findViewById(R.id.name_surname_title)
+        loginTextView = hView.findViewById(R.id.login_title)
+    }
+
+    private fun setUpProfileTextViews() {
+        nameSurnameTextView.text = restWrapper.getMyAccount().nameSurname
+        loginTextView.text = restWrapper.getMyAccount().login
     }
 
     private fun initWebSocketConnection() {
@@ -59,7 +87,6 @@ class MainActivity : AppCompatActivity(), FragmentChanger, ActivityChanger, Hide
     }
 
     private fun initToolbar() {
-        toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
     }
 
@@ -73,13 +100,9 @@ class MainActivity : AppCompatActivity(), FragmentChanger, ActivityChanger, Hide
             this, drawerLayout, toolbar,
             R.string.nav_drawer_open, R.string.nav_drawer_close
         ).apply {
-            setToolbarNavigationClickListener {
-                onBackPressed()
-            }
+            setToolbarNavigationClickListener { onBackPressed() }
         }
-        drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout).apply {
-            addDrawerListener(navDrawerToggle)
-        }
+        drawerLayout.apply { addDrawerListener(navDrawerToggle) }
         navDrawerToggle.syncState()
     }
 

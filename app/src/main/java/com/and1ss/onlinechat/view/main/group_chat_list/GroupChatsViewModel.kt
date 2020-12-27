@@ -42,12 +42,15 @@ class GroupChatsViewModel @ViewModelInject constructor(
     }
 
     suspend fun getChats() = withContext(Dispatchers.IO) {
-        val chats = restWrapper
-            .getApi()
-            .getAllGroupChats()
-            .filter { it.isCompleted }
-            .sortedByDescending { it.lastMessage?.createdAt?.time ?: 0 }
-        _chats.postValue(chats)
+        try {
+            val chats = restWrapper
+                .getApi()
+                .getAllGroupChats()
+                .filter { it.isCompleted }
+                .sortedByDescending { it.lastMessage?.createdAt?.time ?: 0 }
+            _chats.postValue(chats)
+        } catch (e: Exception) {
+        }
     }
 
     private fun onNewWebSocketEvent(event: WebSocketEvent) {
