@@ -1,11 +1,12 @@
-package com.and1ss.onlinechat.view.main.group_chat_list
+package com.and1ss.onlinechat.view.main.private_chat_list
 
 import android.app.Application
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.and1ss.onlinechat.api.dto.GroupChatRetrievalDTO
-import com.and1ss.onlinechat.api.dto.GroupMessageRetrievalDTO
+import com.and1ss.onlinechat.api.dto.PrivateChatRetrievalDTO
+import com.and1ss.onlinechat.api.dto.PrivateMessageRetrievalDTO
+import com.and1ss.onlinechat.api.model.AccountInfo
 import com.and1ss.onlinechat.api.rest.RestWrapper
 import com.and1ss.onlinechat.api.ws.WebSocketEvent
 import com.and1ss.onlinechat.api.ws.WebSocketMessageType
@@ -17,16 +18,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private const val TAG = "ChatsViewModel"
+private const val TAG = "PrivateChatsViewModel"
 
-class GroupChatsViewModel @ViewModelInject constructor(
+class PrivateChatsViewModel @ViewModelInject constructor(
     private val restWrapper: RestWrapper,
     private val webSocketWrapper: WebSocketWrapper,
     application: Application
 ) : AndroidViewModel(application) {
-    private val _chats: MutableLiveData<List<GroupChatRetrievalDTO>> = MutableLiveData(listOf())
-    val chats: LiveData<List<GroupChatRetrievalDTO>>
+    private val _chats: MutableLiveData<List<PrivateChatRetrievalDTO>> = MutableLiveData(listOf())
+    val chats: LiveData<List<PrivateChatRetrievalDTO>>
         get() = _chats
+
+    val myAccount: AccountInfo = restWrapper.getMyAccount()
 
     private val observer = Observer<WebSocketEvent> { onNewWebSocketEvent(it) }
 
@@ -44,7 +47,7 @@ class GroupChatsViewModel @ViewModelInject constructor(
             try {
                 val chats = restWrapper
                     .getApi()
-                    .getAllGroupChats()
+                    .getAllPrivateChats()
                     .filter { it.isCompleted }
                     .sortedByDescending { it.lastMessage?.createdAt?.time ?: 0 }
                 _chats.postValue(chats)
@@ -63,7 +66,9 @@ class GroupChatsViewModel @ViewModelInject constructor(
 
     private fun handleWebSocketMessage(message: WebSocketEvent.WebSocketMessage<*>) {
         when (message.messageType) {
-            WebSocketMessageType.GROUP_MESSAGE_CREATE -> handleNewGroupChatMessageCreation(message)
+            WebSocketMessageType.PRIVATE_MESSAGE_CREATE -> handleNewPrivateChatMessageCreation(
+                message
+            )
 
             else -> {
                 Log.d(TAG, "onNewWebSocketEvent: $message")
@@ -71,11 +76,11 @@ class GroupChatsViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun handleNewGroupChatMessageCreation(
+    private fun handleNewPrivateChatMessageCreation(
         message: WebSocketEvent.WebSocketMessage<*>
     ) {
         try {
-            val msg = fromJson<GroupMessageRetrievalDTO>(
+            val msg = fromJson<PrivateMessageRetrievalDTO>(
                 Gson().toJson(message.payload as LinkedTreeMap<*, *>)
             )
 
@@ -96,10 +101,13 @@ class GroupChatsViewModel @ViewModelInject constructor(
     }
 
     private fun updateChatsWithNewMessage(
-        chats: List<GroupChatRetrievalDTO>,
-        message: GroupMessageRetrievalDTO
+        chats: List<PrivateChatRetrievalDTO>,
+        message: PrivateMessageRetrievalDTO
     ) {
-        fun messageMatchesChat(chat: GroupChatRetrievalDTO, message: GroupMessageRetrievalDTO) =
+        fun messageMatchesChat(
+            chat: PrivateChatRetrievalDTO,
+            message: PrivateMessageRetrievalDTO
+        ) =
             chat.id != null && message.chatId != null && chat.id == message.chatId
 
         for (chat in chats) {

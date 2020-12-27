@@ -11,6 +11,7 @@
     <!-- Navigation drawer strings -->
     <string name="nav_drawer_open">Navigation drawer open</string>
     <string name="nav_drawer_close">Navigation drawer close</string>
+    <string name="logout_label">Logout</string>
 
     <!-- Welcome screen strings -->
     <string name="welcome_label">Welcome to OnlineChat</string>
@@ -46,5 +47,8 @@
 
     <!-- Group chat creation screen strings -->
     <string name="group_chat_creation_label">Create group chat</string>
+
+    <!-- Private chats screen -->
+    <string name="private_chats_label">Private chats</string>
 
 </resources>

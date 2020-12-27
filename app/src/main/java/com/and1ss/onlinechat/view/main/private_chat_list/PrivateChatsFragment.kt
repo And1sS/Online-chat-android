@@ -1,5 +1,6 @@
-package com.and1ss.onlinechat.view.main.group_chat_list
+package com.and1ss.onlinechat.view.main.private_chat_list
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -7,25 +8,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.and1ss.onlinechat.R
-import com.and1ss.onlinechat.api.dto.GroupChatRetrievalDTO
+import com.and1ss.onlinechat.api.dto.PrivateChatRetrievalDTO
 import com.and1ss.onlinechat.view.auth.FragmentChanger
 import com.and1ss.onlinechat.view.main.HideShowIconInterface
-import com.and1ss.onlinechat.view.main.group_chat.GroupChatFragment
-import com.and1ss.onlinechat.view.main.group_chat_creation.GroupChatCreationFragment
+import com.and1ss.onlinechat.view.main.private_chat.PrivateChatFragment
+import com.and1ss.onlinechat.view.main.private_chat_creation.PrivateChatCreationDialogFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 
+private const val TAG = "PrivateChatsFragment"
+
 @AndroidEntryPoint
-class GroupChatsFragment : Fragment() {
-    private val viewModel: GroupChatsViewModel by viewModels()
+class PrivateChatsFragment : Fragment() {
+    private val viewModel: PrivateChatsViewModel by viewModels()
 
     private lateinit var recyclerView: RecyclerView
-    private var mutableList: MutableList<GroupChatRetrievalDTO> = mutableListOf()
+    private var mutableList: MutableList<PrivateChatRetrievalDTO> = mutableListOf()
 
     private lateinit var addButton: FloatingActionButton
 
@@ -55,15 +59,24 @@ class GroupChatsFragment : Fragment() {
         viewModel.getChats()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            REQUEST_CREATE_PRIVATE_CHAT -> viewModel.getChats()
+            else -> super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
     private fun setUpAddButton() {
         addButton.setOnClickListener {
-            (activity as? FragmentChanger)?.transitToFragment(GroupChatCreationFragment.newInstance())
+            val dialog: DialogFragment = PrivateChatCreationDialogFragment.newInstance()
+            dialog.setTargetFragment(this, REQUEST_CREATE_PRIVATE_CHAT)
+            dialog.show(parentFragmentManager, "TEST")
         }
     }
 
     private fun setUpToolbar() {
         (requireActivity() as? HideShowIconInterface)?.showHamburgerIcon()
-        (activity as? AppCompatActivity)?.supportActionBar?.setTitle(R.string.group_chats_label)
+        (activity as? AppCompatActivity)?.supportActionBar?.setTitle(R.string.private_chats_label)
     }
 
     private fun setUpObservers() {
@@ -76,12 +89,14 @@ class GroupChatsFragment : Fragment() {
     }
 
     private fun setUpRecyclerView() {
-        recyclerView.adapter = GroupChatsAdapter(mutableList)
+        recyclerView.adapter = PrivateChatsAdapter(mutableList)
         recyclerView.layoutManager = LinearLayoutManager(context)
     }
 
     companion object {
-        fun newInstance() = GroupChatsFragment()
+        const val REQUEST_CREATE_PRIVATE_CHAT = 1
+
+        fun newInstance(): PrivateChatsFragment = PrivateChatsFragment()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -89,10 +104,10 @@ class GroupChatsFragment : Fragment() {
         return true
     }
 
-    inner class GroupChatsAdapter(private val list: List<GroupChatRetrievalDTO>) :
-        RecyclerView.Adapter<GroupChatsAdapter.GroupChatItemHolder>() {
-        inner class GroupChatItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            private lateinit var chat: GroupChatRetrievalDTO
+    inner class PrivateChatsAdapter(private val list: List<PrivateChatRetrievalDTO>) :
+        RecyclerView.Adapter<PrivateChatsAdapter.PrivateChatItemHolder>() {
+        inner class PrivateChatItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private lateinit var chat: PrivateChatRetrievalDTO
             private val chatTitleTextView: TextView = itemView.findViewById(R.id.chat_title_label)
             private val chatLastMessageTextView: TextView =
                 itemView.findViewById(R.id.last_message_label)
@@ -102,41 +117,39 @@ class GroupChatsFragment : Fragment() {
             init {
                 itemView.setOnClickListener {
                     (activity as? FragmentChanger)?.transitToFragment(
-                        GroupChatFragment.newInstance(chat.mapToGroupChatOrThrow())
+                        PrivateChatFragment.newInstance(chat.mapToPrivateChatOrThrow())
                     )
                 }
             }
 
-            fun bind(chat: GroupChatRetrievalDTO) {
-                chatTitleTextView.text = chat.title
-
-                chatLastMessageTimeTextView.text = if (chat.lastMessage?.createdAt != null) {
-                    chat.lastMessage!!.createdAt.toString()
+            fun bind(chat: PrivateChatRetrievalDTO) {
+                chatTitleTextView.text = if (chat.isCompleted) {
+                    chat.mapToPrivateChatOrThrow()
+                        .getTitle(viewModel.myAccount)
                 } else {
                     ""
                 }
 
-                chatLastMessageTextView.text = if (chat.lastMessage != null) {
-                    chat.lastMessage!!.contents
-                } else {
-                    resources.getString(R.string.no_messages_yet_label)
-                }
+                chatLastMessageTimeTextView.text =
+                    chat.lastMessage?.createdAt?.toString() ?: ""
+
+                chatLastMessageTextView.text = chat.lastMessage?.contents
+                    ?: resources.getString(R.string.no_messages_yet_label)
 
                 this.chat = chat
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupChatItemHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PrivateChatItemHolder {
             val view = LayoutInflater.from(context)
                 .inflate(R.layout.group_chat_list_item, parent, false)
 
-            return GroupChatItemHolder(view)
+            return PrivateChatItemHolder(view)
         }
 
         override fun getItemCount(): Int = list.size
 
-        override fun onBindViewHolder(holder: GroupChatItemHolder, position: Int) =
+        override fun onBindViewHolder(holder: PrivateChatItemHolder, position: Int) =
             holder.bind(list[position])
     }
 }
-

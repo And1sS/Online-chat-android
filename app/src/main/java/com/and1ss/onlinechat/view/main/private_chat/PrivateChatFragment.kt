@@ -1,4 +1,4 @@
-package com.and1ss.onlinechat.view.main.group_chat
+package com.and1ss.onlinechat.view.main.private_chat
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -16,18 +16,16 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.and1ss.onlinechat.R
-import com.and1ss.onlinechat.api.model.GroupChat
+import com.and1ss.onlinechat.api.model.PrivateChat
 import com.and1ss.onlinechat.view.main.HideShowIconInterface
+import com.and1ss.onlinechat.view.main.group_chat.MAX_TITLE_LENGTH
 import dagger.hilt.android.AndroidEntryPoint
 
-
-private const val TAG = "GroupChatFragment"
-
-const val MAX_TITLE_LENGTH = 20
+private const val TAG = "PrivateChatFragment"
 
 @AndroidEntryPoint
-class GroupChatFragment : Fragment() {
-    private val viewModel: GroupChatViewModel by viewModels()
+class PrivateChatFragment : Fragment() {
+    private val viewModel: PrivateChatViewModel by viewModels()
 
     private lateinit var recyclerView: RecyclerView
 
@@ -38,7 +36,7 @@ class GroupChatFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val chat = arguments?.getParcelable<GroupChat>(ARG_CHAT)
+        val chat = arguments?.getParcelable<PrivateChat>(ARG_CHAT)
             ?: throw IllegalStateException("Chat id must be specified")
 
         viewModel.chat = chat
@@ -81,13 +79,14 @@ class GroupChatFragment : Fragment() {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun setUpToolbar() {
-        val title = if (viewModel.chat.title.length > MAX_TITLE_LENGTH) {
-            viewModel.chat.title.substring(0..MAX_TITLE_LENGTH) + "..."
+        val chatTitle = viewModel.chat.getTitle(viewModel.myAccount)
+        val displayableTitle = if (chatTitle.length > MAX_TITLE_LENGTH) {
+            chatTitle.substring(0..MAX_TITLE_LENGTH) + "..."
         } else {
-            viewModel.chat.title
+            chatTitle
         }
         (requireActivity() as? HideShowIconInterface)?.showBackIcon()
-        (requireActivity() as? AppCompatActivity)?.supportActionBar?.title = title
+        (requireActivity() as? AppCompatActivity)?.supportActionBar?.title = displayableTitle
     }
 
     private fun setUpMessageInput() {
@@ -111,7 +110,7 @@ class GroupChatFragment : Fragment() {
                 reverseLayout = true
             }
             overScrollMode = RecyclerView.OVER_SCROLL_NEVER
-            adapter = GroupGhatMessagesAdapter(
+            adapter = PrivateGhatMessagesAdapter(
                 list = viewModel.chatMessages,
                 context = requireContext(),
                 me = viewModel.myAccount
@@ -139,8 +138,8 @@ class GroupChatFragment : Fragment() {
     companion object {
         private const val ARG_CHAT = "CHAT"
 
-        fun newInstance(chat: GroupChat): Fragment =
-            GroupChatFragment().apply {
+        fun newInstance(chat: PrivateChat): Fragment =
+            PrivateChatFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(ARG_CHAT, chat)
                 }

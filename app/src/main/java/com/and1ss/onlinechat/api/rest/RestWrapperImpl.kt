@@ -13,7 +13,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 
 
-private const val BASE_URL = "http://10.0.2.2:8080/api/"
+//private const val BASE_URL = "http://10.0.2.2:8080/api/"
+private const val BASE_URL = "http://176.36.243.160:8080/api/"
 private const val TAG = "Repository"
 
 

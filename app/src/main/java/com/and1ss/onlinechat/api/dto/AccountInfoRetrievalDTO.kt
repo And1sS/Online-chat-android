@@ -12,7 +12,8 @@ data class AccountInfoRetrievalDTO(
     fun mapToAccountInfoOrThrow() =
         AccountInfo(id!!, name!!, surname!!, login!!)
 
-    private fun _isCompleted() = id != null && login != null && name != null && surname != null
+    private fun _isCompleted() = id != null && login != null
+            && name != null && surname != null
 
     val isCompleted: Boolean
         get() = _isCompleted()

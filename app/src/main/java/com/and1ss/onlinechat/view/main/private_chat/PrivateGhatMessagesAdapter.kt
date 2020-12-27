@@ -1,4 +1,4 @@
-package com.and1ss.onlinechat.view.main.group_chat
+package com.and1ss.onlinechat.view.main.private_chat
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,23 +9,23 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.amulyakhare.textdrawable.TextDrawable
 import com.and1ss.onlinechat.R
-import com.and1ss.onlinechat.api.dto.GroupMessageRetrievalDTO
+import com.and1ss.onlinechat.api.dto.PrivateMessageRetrievalDTO
 import com.and1ss.onlinechat.api.model.AccountInfo
 import com.and1ss.onlinechat.util.stringToColor
 import java.text.SimpleDateFormat
 
-class ChatMessagesAdapter(
-    private val list: List<GroupMessageRetrievalDTO>,
+class PrivateGhatMessagesAdapter(
+    private val list: List<PrivateMessageRetrievalDTO>,
     private val context: Context,
     private val me: AccountInfo
 ) :
-    RecyclerView.Adapter<ChatMessagesAdapter.MessageViewHolder>() {
+    RecyclerView.Adapter<PrivateGhatMessagesAdapter.MessageViewHolder>() {
 
     private val dateFormat = SimpleDateFormat("yyyy.MM.dd HH:mm")
 
     open class MessageViewHolder(itemView: View, val dateFormat: SimpleDateFormat) :
         RecyclerView.ViewHolder(itemView) {
-        open fun bind(message: GroupMessageRetrievalDTO) {}
+        open fun bind(message: PrivateMessageRetrievalDTO) {}
 
         class GroupMessageLeftItemHolder(itemView: View, dateFormat: SimpleDateFormat) :
             MessageViewHolder(itemView, dateFormat) {
@@ -35,7 +35,7 @@ class ChatMessagesAdapter(
             private val messageTimeTextView: TextView =
                 itemView.findViewById(R.id.message_time_label)
 
-            override fun bind(message: GroupMessageRetrievalDTO) {
+            override fun bind(message: PrivateMessageRetrievalDTO) {
                 val initials = message.author?.initials ?: ""
                 val nameSurname = (message.author?.name ?: "") + " " + message.author?.surname
 
@@ -59,7 +59,7 @@ class ChatMessagesAdapter(
             private val messageTimeTextView: TextView =
                 itemView.findViewById(R.id.message_time_label)
 
-            override fun bind(message: GroupMessageRetrievalDTO) {
+            override fun bind(message: PrivateMessageRetrievalDTO) {
                 messageTimeTextView.text = if (message.createdAt != null) {
                     dateFormat.format(message.createdAt).toString() + " "
                 } else {

@@ -13,6 +13,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.and1ss.onlinechat.R
 import com.and1ss.onlinechat.api.rest.RestWrapper
 import com.and1ss.onlinechat.api.ws.WebSocketWrapper
@@ -20,6 +21,7 @@ import com.and1ss.onlinechat.view.auth.ActivityChanger
 import com.and1ss.onlinechat.view.auth.FragmentChanger
 import com.and1ss.onlinechat.view.main.friends.FriendsFragment
 import com.and1ss.onlinechat.view.main.group_chat_list.GroupChatsFragment
+import com.and1ss.onlinechat.view.main.private_chat_list.PrivateChatsFragment
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -28,7 +30,8 @@ import javax.inject.Inject
 private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), FragmentChanger, ActivityChanger, HideShowIconInterface {
+class MainActivity : AppCompatActivity(), FragmentChanger,
+    ActivityChanger, HideShowIconInterface, FragmentManagerProvider {
     @Inject
     lateinit var webSocketWrapper: WebSocketWrapper
 
@@ -111,6 +114,7 @@ class MainActivity : AppCompatActivity(), FragmentChanger, ActivityChanger, Hide
         viewModel.state = when (menuItem.itemId) {
             R.id.nav_friends -> MainActivityViewModel.Screens.FRIENDS
             R.id.nav_group_chats -> MainActivityViewModel.Screens.GROUP_CHATS
+            R.id.nav_private_chats -> MainActivityViewModel.Screens.PRIVATE_CHATS
             else -> viewModel.state
         }
 
@@ -118,6 +122,7 @@ class MainActivity : AppCompatActivity(), FragmentChanger, ActivityChanger, Hide
             val newFragment = when (viewModel.state) {
                 MainActivityViewModel.Screens.FRIENDS -> FriendsFragment.newInstance()
                 MainActivityViewModel.Screens.GROUP_CHATS -> GroupChatsFragment.newInstance()
+                MainActivityViewModel.Screens.PRIVATE_CHATS -> PrivateChatsFragment.newInstance()
                 else -> FriendsFragment.newInstance()
             }
             replaceFragment(newFragment)
@@ -183,9 +188,15 @@ class MainActivity : AppCompatActivity(), FragmentChanger, ActivityChanger, Hide
         fun newIntent(packageContext: Context) =
             Intent(packageContext, MainActivity::class.java)
     }
+
+    override fun getActivityFragmentManager() = supportFragmentManager
 }
 
 interface HideShowIconInterface {
     fun showHamburgerIcon()
     fun showBackIcon()
+}
+
+interface FragmentManagerProvider {
+    fun getActivityFragmentManager(): FragmentManager
 }

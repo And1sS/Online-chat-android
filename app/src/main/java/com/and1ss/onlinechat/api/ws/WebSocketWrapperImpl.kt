@@ -17,7 +17,9 @@ import javax.inject.Inject
 private const val TAG = "WebSocketWrapper"
 
 private const val NUM_OF_THREADS = 1
-private const val REMOTE_HOST_URL = "ws://10.0.2.2:8080/api/ws"
+
+//private const val REMOTE_HOST_URL = "ws://10.0.2.2:8080/api/ws"
+private const val REMOTE_HOST_URL = "ws://176.36.243.160:8080/api/ws"
 private const val AUTHORIZATION_HEADER = "Authorization"
 private const val BEARER_PREFIX = "Bearer "
 

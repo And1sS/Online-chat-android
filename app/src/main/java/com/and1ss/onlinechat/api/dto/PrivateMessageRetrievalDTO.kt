@@ -3,8 +3,7 @@ package com.and1ss.onlinechat.api.dto
 import com.google.gson.annotations.SerializedName
 import java.sql.Timestamp
 
-
-data class GroupMessageRetrievalDTO(
+data class PrivateMessageRetrievalDTO(
     var id: String? = null,
     var author: AccountInfoRetrievalDTO? = null,
 
