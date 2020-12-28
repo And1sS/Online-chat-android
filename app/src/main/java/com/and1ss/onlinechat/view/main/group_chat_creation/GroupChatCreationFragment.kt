@@ -144,8 +144,8 @@ class GroupChatCreationFragment : Fragment() {
             private val selectedCheckBox: CheckBox = itemView.findViewById(R.id.checkbox)
 
             init {
-                selectedCheckBox.setOnCheckedChangeListener { _, isChecked ->
-                    participant = Pair(participant.first, isChecked)
+                selectedCheckBox.setOnClickListener {
+                    participant = Pair(participant.first, selectedCheckBox.isChecked)
                     viewModel.setSelection(participant)
                     creationButton.isEnabled = viewModel.creationReady
                 }
@@ -160,6 +160,7 @@ class GroupChatCreationFragment : Fragment() {
                 )
                 profileTextView.text = user.nameSurname
                 profileLoginTextView.text = user.login
+
                 selectedCheckBox.isChecked = participant.second
             }
         }
