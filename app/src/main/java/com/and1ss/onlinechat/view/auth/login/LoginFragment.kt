@@ -84,7 +84,11 @@ class LoginFragment : Fragment() {
             when (it) {
                 LoginViewModel.State.LOGGED_IN -> transitToMainActivity()
                 LoginViewModel.State.FAILED ->
-                    Toast.makeText(requireContext(), "Failed to log in", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed to log in",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 else -> {
                 }
             }

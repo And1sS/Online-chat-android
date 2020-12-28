@@ -191,7 +191,7 @@ class MainActivity : AppCompatActivity(), FragmentChanger,
 
     override fun <T> startActivity(clazz: Class<T>) {
         val intent = Intent(this, clazz).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         startActivity(intent)
     }
