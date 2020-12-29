@@ -46,7 +46,7 @@ class WebSocketWrapperImpl @Inject constructor(
 
     override fun connect() {
         if (this::webSocket.isInitialized) {
-            webSocket.cancel()
+            webSocket.close(1000, "")
         }
 
         val requestBuilder: Request.Builder = Request
@@ -62,7 +62,7 @@ class WebSocketWrapperImpl @Inject constructor(
 
     override fun disconnect() {
         if (this::webSocket.isInitialized) {
-            webSocket.cancel()
+            webSocket.close(1000, "")
 
             isConnected.set(false)
         }
@@ -77,8 +77,11 @@ class WebSocketWrapperImpl @Inject constructor(
             eventBus.postValue(WebSocketEvent.ReconnectionAttempt)
             Log.d(TAG, "reconnection attempt")
 
-            webSocket.cancel()
-            connect()
+            webSocket.close(1000, "")
+
+            if (restWrapper.isLoggedIn() && !isConnected.get()) {
+                connect()
+            }
         }
     }
 

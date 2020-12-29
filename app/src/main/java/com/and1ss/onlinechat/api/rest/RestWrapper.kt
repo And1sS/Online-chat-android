@@ -5,6 +5,8 @@ import com.and1ss.onlinechat.api.model.AccountInfo
 
 interface RestWrapper {
     suspend fun login(loginCredentials: LoginInfoDTO)
+    suspend fun logout()
+    fun isLoggedIn(): Boolean
     fun getApi(): ApiEndpoints
     fun getMyAccount(): AccountInfo
     fun getAccessToken(): String

@@ -54,6 +54,12 @@ class RestWrapperImpl
             saveMyAccount(api.getMyAccount().mapToAccountInfoOrThrow())
         }
 
+    override suspend fun logout() {
+        accessToken = ""
+    }
+
+    override fun isLoggedIn(): Boolean = accessToken.isNotEmpty()
+
     override fun getAccessToken(): String = accessToken
 
     override suspend fun saveAccessToken(accessToken: String) {

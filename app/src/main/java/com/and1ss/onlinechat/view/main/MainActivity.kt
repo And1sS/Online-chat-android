@@ -118,7 +118,9 @@ class MainActivity : AppCompatActivity(), FragmentChanger,
         navDrawerToggle.syncState()
         logoutButton.setOnClickListener {
             lifecycle.coroutineScope.launch {
+                restWrapper.logout()
                 sharedPreferencesWrapper.deleteAccessToken()
+                webSocketWrapper.disconnect()
                 startActivity(AuthenticationActivity::class.java)
             }
         }
@@ -138,7 +140,6 @@ class MainActivity : AppCompatActivity(), FragmentChanger,
                 MainActivityViewModel.Screens.FRIENDS -> FriendsFragment.newInstance()
                 MainActivityViewModel.Screens.GROUP_CHATS -> GroupChatsFragment.newInstance()
                 MainActivityViewModel.Screens.PRIVATE_CHATS -> PrivateChatsFragment.newInstance()
-                else -> FriendsFragment.newInstance()
             }
             replaceFragment(newFragment)
             drawerLayout.closeDrawer(GravityCompat.START)
